@@ -7,9 +7,11 @@ function isMobileDevice(DEVICE) {
 }
 
 let isMobile;
-
+let columns,rows;
 let grid;
 
+const resolution = 4;
+const spread = 10;
 let hue = 0;
 
 function fixCanvas(canvas,dpi){
@@ -24,7 +26,7 @@ function fixCanvas(canvas,dpi){
 
 };
 
-function make2dArray(columns,rows){
+function make2dArray(){
 
     const arr = new Array(columns);
 
@@ -36,13 +38,11 @@ function make2dArray(columns,rows){
     return arr;
 };
 
-function drawGrid(context,resolution,grid){
+function drawGrid(context,grid){
 
-    
+    for(let i = columns - 1; i >= 0; i--){
 
-    for(let i = 0; i < grid.length; i++){
-
-        for(let j = 0; j < grid[i].length; j++){
+        for(let j = rows - 1; j >= 0; j--){
 
             const cell = grid[i][j];
 
@@ -60,15 +60,11 @@ function drawGrid(context,resolution,grid){
 
 function updateGrid(grid){
 
-    const newGrid = grid.map( cell => cell.map( val => 0));
+    const newGrid = grid.map( cell => cell.map( _ => 0));
 
-    const columns = newGrid.length;
+    for(let i = columns - 1; i >= 0; i--){
 
-    const rows = newGrid[0].length;
-
-    for(let i = 0; i < columns; i++){
-
-        for(let j = 0; j < rows; j++){
+        for(let j = rows - 1; j >= 0; j--){
 
             const state = grid[i][j];
 
@@ -118,7 +114,7 @@ function updateGrid(grid){
     return newGrid;
 };
 
-function animate(context,resolution){
+function animate(context){
   
     let lasttime = performance.now();
     
@@ -132,7 +128,7 @@ function animate(context,resolution){
 
             grid = updateGrid(grid);
 
-            drawGrid(context,resolution,grid);
+            drawGrid(context,grid);
 
             lasttime = timestamp;
 
@@ -143,11 +139,36 @@ function animate(context,resolution){
     requestAnimationFrame(loop);
 };
 
+function handleAddingSandOnMove(event){
+
+    event.preventDefault();
+
+    const { clientX, clientY } = isMobile ? event.touches[0]:event;
+
+    const col = Math.floor(clientX * devicePixelRatio / resolution);
+
+    const row = Math.floor(clientY * devicePixelRatio / resolution);
+
+    if(!col || !row) return;
+
+    for(let i = -spread; i < spread; i++){
+
+        for(let j = -spread; j < spread; j++){
+
+            if(!grid[col + i]) continue;
+
+            if(Math.random() < 0.25) grid[col + i][row + j] = hue;
+            
+        }
+    }
+
+    hue += 1;
+}
+
 function initializeSite(){
 
     isMobile = isMobileDevice(navigator.userAgent || navigator.vendor || window.opera);
 
-    const resolution = 5;
 
     const fallingSandCanvas = document.querySelector(`#FallingSandCanvas`);
 
@@ -159,45 +180,15 @@ function initializeSite(){
 
     const fallingSandCanvasHeight = fallingSandCanvas.height;
 
-    const columns = Math.floor(fallingSandCanvasWidth / resolution);
+    columns = Math.floor(fallingSandCanvasWidth / resolution);
 
-    const rows = Math.floor(fallingSandCanvasHeight / resolution);
+    rows = Math.floor(fallingSandCanvasHeight / resolution);
 
-    grid = make2dArray(columns,rows);
+    grid = make2dArray();
 
-    fallingSandCanvas.addEventListener(isMobile ? 'touchmove':'pointermove', (event)=>{
+    fallingSandCanvas.addEventListener(isMobile ? 'touchmove':'pointermove', handleAddingSandOnMove);
 
-        event.preventDefault();
-
-        const { clientX, clientY } = isMobile ? event.touches[0]:event;
-
-        const col = Math.floor(clientX * devicePixelRatio / resolution);
-
-        const row = Math.floor(clientY * devicePixelRatio / resolution);
-
-        if(!col || !row) return;
-
-        const range = 5;
-
-        for(let i = -range; i < range; i++){
-
-            for(let j = -range; j < range; j++){
-
-                if(!grid[col + i]) continue;
-
-                grid[col + i][row + j] = hue;
-            }
-        }
-
-        hue += 0.5;
-
-    });
-
-    console.log(grid);
-
-    //drawGrid(fallingSandCanvasContext,resolution,grid);
-
-    animate(fallingSandCanvasContext,resolution);
+    animate(fallingSandCanvasContext);
 
 };
 
