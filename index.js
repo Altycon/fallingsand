@@ -224,7 +224,7 @@ function initializeSite(){
 
         const button = document.querySelector('#FallingSandAutoColorButton');
 
-        if(button.value === "true") button.value = "false";
+        if(button.value === "true") button.style.backgroundColor = 'black';
 
         autoColor = false;
 
