@@ -5,6 +5,7 @@
 body{
     position: relative;
     min-height: 100vh;
+    background-color: hsl(0 0% 10%);
 }
 
 .header-primary{
@@ -70,8 +71,10 @@ label[for=FallingSandColorInput]::before{
 }
 #FallingSandCanvas{
     position: absolute;
-    top: 0; left: 0;
-    width: 100vw; height: 100vh;
+    top: 50%; left: 50%;
+    transform: translate(-50%,-50%);
+    width: 90vw; height: 90vh;
+    
     background-color: hsl(0 0% 0%);
 }
 .falling-sand-active-color-display{
