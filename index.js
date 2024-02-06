@@ -209,13 +209,13 @@ function initializeSite(){
 
             autoColor = true;
 
-            event.target.value = "true";
+            event.target.style.backgroundColor = 'cornflowerblue';
 
         }else if(event.target.value === "true"){
 
             autoColor = false;
 
-            event.target.value = "false";
+            event.target.style.backgroundColor = 'black';
         }
 
     })
