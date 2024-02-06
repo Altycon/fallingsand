@@ -166,7 +166,14 @@ function handleAddingSandOnMove(event){
     if(autoColor){
 
         hue += 1;
+
+        setActiveColorDisplay(hue);
     }
+}
+
+function setActiveColorDisplay(hue){
+
+    document.querySelector('.falling-sand-active-color-display').style.backgroundColor = `hsl(${hue} 100% 50%)`;
 }
 
 function initializeSite(){
@@ -190,6 +197,8 @@ function initializeSite(){
 
     grid = make2dArray();
 
+    setActiveColorDisplay(hue);
+
     fallingSandCanvas.addEventListener(isMobile ? 'touchmove':'pointermove', handleAddingSandOnMove);
 
     animate(fallingSandCanvasContext);
@@ -209,7 +218,6 @@ function initializeSite(){
             event.target.value = "false";
         }
 
-        console.log(event.target.value)
     })
 
     document.querySelector('#FallingSandColorInput').addEventListener('input', (event)=>{
@@ -218,7 +226,7 @@ function initializeSite(){
 
         hue = Number(event.target.value);
 
-        console.log(event.target.value)
+        setActiveColorDisplay(hue);
     })
 
 };
