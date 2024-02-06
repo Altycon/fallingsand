@@ -13,6 +13,7 @@ let grid;
 const resolution = 4;
 const spread = 10;
 let hue = 0;
+let autoColor = true;
 
 function fixCanvas(canvas,dpi){
 
@@ -162,7 +163,10 @@ function handleAddingSandOnMove(event){
         }
     }
 
-    hue += 1;
+    if(autoColor){
+
+        hue += 1;
+    }
 }
 
 function initializeSite(){
@@ -189,6 +193,33 @@ function initializeSite(){
     fallingSandCanvas.addEventListener(isMobile ? 'touchmove':'pointermove', handleAddingSandOnMove);
 
     animate(fallingSandCanvasContext);
+
+    document.querySelector('#FallingSandAutoColorButton').addEventListener('click', (event)=>{
+
+        if(event.target.value === "false"){
+
+            autoColor = true;
+
+            event.target.value = "true";
+
+        }else if(event.target.value === "true"){
+
+            autoColor = false;
+
+            event.target.value = "false";
+        }
+
+        console.log(event.target.value)
+    })
+
+    document.querySelector('#FallingSandColorInput').addEventListener('input', (event)=>{
+
+        autoColor = false;
+
+        hue = Number(event.target.value);
+
+        console.log(event.target.value)
+    })
 
 };
 
