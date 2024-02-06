@@ -71,10 +71,8 @@ label[for=FallingSandColorInput]::before{
 }
 #FallingSandCanvas{
     position: absolute;
-    top: 50%; left: 50%;
-    transform: translate(-50%,-50%);
-    width: 90vw; height: 90vh;
-    
+    top: 0%; left: 0%;
+    width: 100vw; height: 90vh;
     background-color: hsl(0 0% 0%);
 }
 .falling-sand-active-color-display{
