@@ -222,6 +222,10 @@ function initializeSite(){
 
     document.querySelector('#FallingSandColorInput').addEventListener('input', (event)=>{
 
+        const button = document.querySelector('#FallingSandAutoColorButton');
+
+        if(button.value === "true") button.value = "false";
+
         autoColor = false;
 
         hue = Number(event.target.value);
