@@ -21,7 +21,9 @@ function fixCanvas(canvas,dpi){
 
     const styleWidth = +getComputedStyle(main).getPropertyValue('width').slice(0,-2);
     
-    const styleHeight = +getComputedStyle(main).getPropertyValue('height').slice(0,-2);
+    let styleHeight = +getComputedStyle(main).getPropertyValue('height').slice(0,-2);
+
+    if(isMobile) styleHeight = styleHeight - (window.screen.height - innerHeight);
 
     canvas.setAttribute('width', styleWidth * dpi);
 
@@ -181,6 +183,7 @@ function setActiveColorDisplay(hue){
 }
 
 function initializeSite(){
+
 
     isMobile = isMobileDevice(navigator.userAgent || navigator.vendor || window.opera);
 
