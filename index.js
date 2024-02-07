@@ -146,11 +146,13 @@ function handleAddingSandOnMove(event){
 
     event.preventDefault();
 
-    const { clientX, clientY } = isMobile ? event.touches[0]:event;
+    const { target, clientX, clientY } = isMobile ? event.touches[0]:event;
 
-    const col = Math.floor(clientX * devicePixelRatio / resolution);
+    const rect = target.getBoundingClientRect();
 
-    const row = Math.floor(clientY * devicePixelRatio / resolution);
+    const col = Math.floor((clientX - rect.left) * devicePixelRatio / resolution);
+
+    const row = Math.floor((clientY - rect.top) * devicePixelRatio / resolution);
 
     if(!col || !row) return;
 
