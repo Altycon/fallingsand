@@ -1,44 +1,48 @@
+:root{
+    --header-height: 4rem;
+}
+
 *,::before,::after{margin: 0;padding: 0;box-sizing: border-box;}
 
 
 
 body{
     position: relative;
-    min-height: 100vh;
+    height: 100vh;
     background-color: hsl(0 0% 10%);
 }
 
 .header-primary{
-    position: fixed;
-    top: 0; left: 0;
-    width: 100vw;
+    position: relative;
+    height: var(--header-height);
     padding: 1rem;
     
     display: grid;
-    grid-template-columns: auto 3fr;
+    grid-template-columns: auto auto 3fr;
     grid-template-rows: auto;
     gap: 2rem;
 }
-#FallingSandAutoColorButton{
+.header-primary > button{
     font-size: 1rem;
     padding: 3px 5px;
     border: none;
     outline: 1px solid white;
+
     background-color: black;
     color: white;
     box-shadow: 3px 3px 5px hsl(0 0% 100% / 0.8),
     inset 1px 1px 3px hsl(0 0% 100% / 0.8);
 }
-#FallingSandAutoColorButton[value=false]{
+.header-primary > button[value=false]{
     background-color: black;
 }
-#FallingSandAutoColorButton[value=true]{
+.header-primary > button[value=true]{
     background-color: cornflowerblue;
 }
-#FallingSandAutoColorButton:hover{
+.header-primary > button:hover{
     background-color: hsl(0 0% 20%);
 }
-#FallingSandAutoColorButton:active{
+.header-primary > button:active{
     background-color: hsl(0 0% 20%);
     transform: scale(0.98);
 }
@@ -69,12 +73,7 @@ label[for=FallingSandColorInput]::before{
 #FallingSandColorInput{
     width: 100%;
 }
-#FallingSandCanvas{
-    position: absolute;
-    top: 0%; left: 0%;
-    width: 100vw; height: 90vh;
-    background-color: hsl(0 0% 0%);
-}
+
 .falling-sand-active-color-display{
     position: absolute;
     top: 100%; right: 5%;
@@ -82,4 +81,13 @@ label[for=FallingSandColorInput]::before{
     height: 25px;
     border-radius: 50%;
     
+}
+main{
+    height: calc(100vh - var(--header-height) - 5px);
+}
+
+#FallingSandCanvas{
+
+    width: 100%; height: 100%;
+    background-color: hsl(0 0% 0%);
 }

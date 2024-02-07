@@ -17,9 +17,11 @@ let autoColor = true;
 
 function fixCanvas(canvas,dpi){
 
-    const styleWidth = +getComputedStyle(canvas).getPropertyValue('width').slice(0,-2);
+    const main = document.querySelector('main');
+
+    const styleWidth = +getComputedStyle(main).getPropertyValue('width').slice(0,-2);
     
-    const styleHeight = +getComputedStyle(canvas).getPropertyValue('height').slice(0,-2);
+    const styleHeight = +getComputedStyle(main).getPropertyValue('height').slice(0,-2);
 
     canvas.setAttribute('width', styleWidth * dpi);
 
@@ -61,7 +63,7 @@ function drawGrid(context,grid){
 
 function updateGrid(grid){
 
-    const newGrid = grid.map( cell => cell.map( _ => 0));
+    const newGrid = grid.map( cell => cell.map( val => 0));
 
     for(let i = columns - 1; i >= 0; i--){
 
@@ -209,15 +211,35 @@ function initializeSite(){
 
             autoColor = true;
 
+            event.target.value = "true";
+
             event.target.style.backgroundColor = 'cornflowerblue';
 
         }else if(event.target.value === "true"){
 
             autoColor = false;
 
+            event.target.value = "false";
+
             event.target.style.backgroundColor = 'black';
         }
 
+    });
+
+    document.querySelector('#FallingSandCanvasResetButton').addEventListener('click', _=>{
+
+        if(confirm('Are you sure you want to reset the image?')){
+
+            fallingSandCanvasContext.clearRect(
+                0,
+                0,
+                fallingSandCanvasContext.canvas.width,
+                fallingSandCanvasContext.canvas.height
+            );
+
+            grid = make2dArray();
+        }
+        
     })
 
     document.querySelector('#FallingSandColorInput').addEventListener('input', (event)=>{
