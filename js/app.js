@@ -18,7 +18,9 @@ const APP = {
 
         const rect = target.getBoundingClientRect();
 
-        FallingSand.addSand((clientX - rect.left),(clientY - rect.top));
+        console.log(rect)
+
+        FallingSand.addSand((clientX - rect.left) * APP.DPI,(clientY - rect.top) * APP.DPI);
 
     },
     handleAutoColorSwitch: function(event){
