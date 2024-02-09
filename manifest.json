@@ -1,0 +1,33 @@
+{
+    "id": "?should I keep this",
+    "name": "Falling Sand",
+    "short_name": "Sandfall",
+    "icons": [
+        {
+            "src":"",
+            "sizes":"",
+            "type":"",
+            "purpose": ""
+        }
+    ],
+    "start_url": "http://127.0.0.1:5500",
+    "display":"standalone",
+    "display_override":"",
+    "background_color": "",
+    "theme_color": "",
+    "categories": "",
+    "description": "",
+    "launch_handler": "client_mode",
+    "prefer_related_applications": "false",
+    "scope": "restricts pages viewed while manifest is applied",
+    "screenshots": [
+        {
+            "src":"",
+            "sizes":"",
+            "type":"",
+            "form_factor": "narrow",
+            "label": "name of screenshot",
+            "platform": "android chromeos ipados ios kaios macos windows xbox chrome_web_store itumes microsoft-inbox microsoft-store play"
+        }
+    ]
+}

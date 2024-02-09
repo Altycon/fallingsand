@@ -84,7 +84,7 @@ label[for=FallingSandColorInput]::before{
     
 }
 main{
-    height: calc(100vh - var(--header-height) - 5px);
+    height: calc(90vh - var(--header-height) - 5px);
 }
 
 #FallingSandCanvas{
