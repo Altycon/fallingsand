@@ -21,3 +21,8 @@ export function fixCanvas(canvas,dpi){
     return canvas;
 
 };
+
+export function hasServiceWorker(){
+
+    return ('serviceWorker' in navigator);
+};

@@ -1,14 +1,52 @@
+
 import { FallingSand } from "./falling_sand.js";
-import { fixCanvas, isMobileDevice } from "./utilities.js";
+import { notify } from "./notification.js";
+import { fixCanvas, hasServiceWorker, isMobileDevice } from "./utilities.js";
+
+const version = 2;
 
 const APP = {
 
+    isOnline: true,
     isMobile: false,
+    serviceWorker: undefined,
+    indexedDatabse: undefined,
+    cacheName: `staticCache-${version}`,
     fallingSandCanvas: undefined,
     fallingSandContext: undefined,
     fallingSandCanvasWidth: 0,
     fallingSandCanvasHeight: 0,
     DPI: devicePixelRatio,
+
+    probably: function(){
+
+
+        return APP.isOnline ? "Probably Online": "Probably Offline";
+
+    },
+
+    goneOnline: function(event){
+
+        APP.isOnline = true;
+
+        notify('ONLINE');
+
+    },
+    goneOffline: function(event){
+
+        APP.isOnline = false;
+
+        notify('OFFLINE');
+    },
+
+    // startCaching: function(){
+
+    //     caches.open(APP.cacheName).then( cache => {
+
+    //         console.log('Cache', cache)
+    //     });
+
+    // },
 
     handleAddingSandOnMove: function(event){
 
@@ -18,9 +56,7 @@ const APP = {
 
         const rect = target.getBoundingClientRect();
 
-        console.log(rect)
-
-        FallingSand.addSand((clientX - rect.left) * APP.DPI,(clientY - rect.top) * APP.DPI);
+        FallingSand.addSand( Math.floor(clientX - rect.left) * APP.DPI, Math.floor(clientY - rect.top) * APP.DPI);
 
     },
     handleAutoColorSwitch: function(event){
@@ -75,6 +111,103 @@ const APP = {
             FallingSand.reset();
         }
     },
+
+    controlMyImage(){
+
+        const myimage = document.querySelector('.myimage_wrapper');
+
+        function handleResetMyImage({target}){
+            target.style.opacity = 0;
+            target.style.top = "";
+            target.style.bottom = ""
+            target.style.right = "";
+            target.style.left = "";
+            target.style.rotate = ``;
+            target.translate = ``;
+            target.style.animation = ``;
+        };
+
+        setInterval( ()=> {
+
+            const randomState = Math.floor(Math.random()*5);
+
+            switch(randomState){
+
+                case 0:
+
+                myimage.style.opacity = 1;
+                myimage.style.top = `${Math.floor(Math.random()*innerWidth)}px`;
+                myimage.style.right = 0;
+                myimage.style.rotate = `270deg`;
+                myimage.translate = `200px 0px`;
+                myimage.addEventListener('animationend', handleResetMyImage);
+                myimage.style.animation = `slideImageRight 1s linear forwards`;
+
+                break;
+
+                case 1:
+
+                myimage.style.opacity = 1;
+                myimage.style.top = 0;
+                myimage.style.left = `${Math.floor(Math.random()*(innerWidth - 200))}px`;
+                myimage.style.rotate = `180deg`;
+                myimage.translate = `0px -300px`;
+                myimage.addEventListener('animationend', handleResetMyImage);
+                myimage.style.animation = `slideImageDown 1s linear forwards`;
+
+                break;
+
+                case 2:
+
+                myimage.style.opacity = 1;
+                myimage.style.bottom = 0;
+                myimage.style.left = `${Math.floor(Math.random()*(innerWidth - 200))}px`;
+                myimage.translate = `0px 300px`;
+                myimage.addEventListener('animationend', handleResetMyImage);
+                myimage.style.animation = `slideImageUp 1s linear forwards`;
+
+                break;
+
+                case 3:
+
+                myimage.style.opacity = 1;
+                myimage.style.top = `${Math.floor(Math.random()*innerWidth)}px`;
+                myimage.style.left = 0;
+                myimage.style.rotate = `90deg`;
+                myimage.translate = `-200px 0px`;
+                myimage.addEventListener('animationend', handleResetMyImage);
+                myimage.style.animation = `slideImageLeft 1s linear forwards`;
+
+                break;
+                
+                case 4:
+
+                myimage.style.opacity = 1;
+                myimage.style.top = `${Math.floor(Math.random()*innerWidth)}px`;
+                myimage.style.right = 0;
+                myimage.style.rotate = `300deg`;
+                myimage.translate = `200px 0px`;
+                myimage.addEventListener('animationend', handleResetMyImage);
+                myimage.style.animation = `slideImageRight 1s linear forwards`;
+
+                break;
+                default:
+
+                myimage.style.opacity = 1;
+                myimage.style.bottom = 0;
+                myimage.style.left = `${Math.floor(Math.random()*(innerWidth - 200))}px`;
+                myimage.translate = `0px 300px`;
+                myimage.addEventListener('animationend', handleResetMyImage);
+                myimage.style.animation = `slideImageUp 1s linear forwards`;
+
+                break;
+            }
+        }, Math.floor(10 + (Math.random() * 60)) * 1000);
+
+
+    },
+
+
     listen(){
 
         APP.fallingSandCanvas.addEventListener(APP.isMobile ? 'touchmove':'pointermove', APP.handleAddingSandOnMove);
@@ -86,13 +219,86 @@ const APP = {
         document.querySelector('#FallingSandColorInput').addEventListener('input', APP.handleColorInput);
     },
 
-    init: function(){
+    init(){
+
+        notify(APP.probably())
+
+        window.addEventListener('online', APP.goneOnline);
+
+        window.addEventListener('offline', APP.goneOffline);
+
+
+        if(hasServiceWorker()){
+
+            console.log('service worker found')
+
+            navigator.serviceWorker.register('/sw.js', {
+
+                    //updateViaCache: 'none',
+                    scope: '/'
+
+                })
+                .then( (registration) => {
+
+                    APP.serviceWorker = registration.installing || registration.waiting || registration.active;
+
+                    console.log('service worker registered');
+
+                })
+                .catch( (error)=> {
+
+                    console.log(`Failed to register`, error.message);
+
+                });
+
+                // see if page currently has service worker
+                if(navigator.serviceWorker.controller){
+
+                    console.log('Serive worker is installed');
+
+                    navigator.serviceWorker.controller.postMessage({
+                        
+                        checkOnline: APP.isOnline
+
+                    });
+                };
+
+                navigator.serviceWorker.oncontrollerchange = (event)=>{
+
+                    console.log('New service worker activated', event);
+                };
+
+                navigator.serviceWorker.addEventListener('message', ({ data })=>{
+
+                    //recieved a message fro mthe service worker
+                    console.log(data, 'from service worker');
+
+                    // do something with the response from the service worker
+                    if('isOnline' in data){
+
+                        APP.isOnline = data.isOnline;
+
+                        notify(APP.isOnline ? 'CONFIRMED: ONLINE':'CONFIRMED: OFFLINE');
+
+                        if(APP.isOnline){
+
+                            console.log('Maybe I should do something here.');
+                        }
+                    }
+                });
+
+                
+        }else{
+
+            console.log('Serive worker not supported');
+
+            alert('Serive worker not supported in your browser');
+        }
+
 
         APP.isMobile = isMobileDevice(navigator.userAgent || navigator.vendor || window.opera);
 
         APP.fallingSandCanvas = fixCanvas(document.querySelector(`#FallingSandCanvas`),APP.DPI);
-
-        console.log(APP.fallingSandCanvas)
 
         APP.fallingSandContext = APP.fallingSandCanvas.getContext('2d');
 
@@ -106,7 +312,10 @@ const APP = {
 
         FallingSand.animate(APP.fallingSandContext);
 
+        APP.controlMyImage();
+
     },
 };
-APP.init();
+//APP.init();
+document.addEventListener('DOMContentLoaded', APP.init);
 

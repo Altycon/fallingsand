@@ -1,33 +1,61 @@
 {
-    "id": "?should I keep this",
     "name": "Falling Sand",
-    "short_name": "Sandfall",
+    "short_name": "Sandy",
+    "id": "/?source=pwa",
+    "start_url": "/",
     "icons": [
         {
-            "src":"",
-            "sizes":"",
-            "type":"",
-            "purpose": ""
+            "src": "/favicon.ico",
+            "sizes": "48x48",
+            "type": "image/png"
+        },
+        {
+            "src": "/img/favicon-16x16.png",
+            "sizes": "16x16",
+            "type": "image/png"
+        },
+        {
+            "src": "/img/favicon-32x32.png",
+            "sizes": "32x32",
+            "type": "image/png"
+        },
+        {
+            "src": "/img/android-chrome-192x192.png",
+            "sizes": "192x192",
+            "type": "image/png"
+        },
+        {
+            "src": "/img/android-chrome-512x512.png",
+            "sizes": "512x512",
+            "type": "image/png"
+        },
+        {
+            "src": "/img/apple-touch-icon.png",
+            "sizes": "180x180",
+            "type": "image/png"
         }
     ],
-    "start_url": "http://127.0.0.1:5500",
+    "orientation": "portrait-primary",
+    "theme_color": "#000000",
+    "background_color": "#000000",
     "display":"standalone",
-    "display_override":"",
-    "background_color": "",
-    "theme_color": "",
-    "categories": "",
-    "description": "",
-    "launch_handler": "client_mode",
-    "prefer_related_applications": "false",
-    "scope": "restricts pages viewed while manifest is applied",
+    "description": "A simple falling sand simulation application.",
+    "prefer_related_applications": false,
+    "scope": "/",
     "screenshots": [
         {
-            "src":"",
-            "sizes":"",
-            "type":"",
+            "src":"/img/screenshot_fallingsand_323x703.png",
+            "sizes":"323x703",
+            "type":"image/png",
             "form_factor": "narrow",
-            "label": "name of screenshot",
-            "platform": "android chromeos ipados ios kaios macos windows xbox chrome_web_store itumes microsoft-inbox microsoft-store play"
+            "label": "falling sand app screenshot narrow"
+        },
+        {
+            "src":"/img/screenshot_fallingsand_718x332.png",
+            "sizes":"718x332",
+            "type":"image/png",
+            "form_factor": "wide",
+            "label": "falling sand app screenshot wide"
         }
     ]
 }

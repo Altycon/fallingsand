@@ -1,15 +1,36 @@
+/*
+--------------------------------------------------------
+
+            CUSTOM VARIABLES
+
+--------------------------------------------------------
+*/
 :root{
     --header-height: 4rem;
 }
 
+/*
+--------------------------------------------------------
+
+            RESETS
+
+--------------------------------------------------------
+*/
 *,::before,::after{margin: 0;padding: 0;box-sizing: border-box;}
 
+/*
+--------------------------------------------------------
 
+            APPLICATION WIDE
+
+--------------------------------------------------------
+*/
 
 body{
     position: relative;
     height: 100vh;
     background-color: hsl(0 0% 10%);
+    overflow: hidden;
 }
 
 .header-primary{
@@ -87,14 +108,122 @@ main{
     height: calc(100vh - var(--header-height) - 5px);
 }
 
+/*
+--------------------------------------------------------
+
+            CANVAS
+
+--------------------------------------------------------
+*/
 #FallingSandCanvas{
 
     width: 100%; height: 100%;
     background-color: hsl(0 0% 0%);
 }
+/*
+--------------------------------------------------------
+
+            NOTIFICATION MODEL
+
+--------------------------------------------------------
+*/
+
+.notification-modal{
+    position: fixed;
+    top: 10%; left: 0;
+    max-width: 350px;
+    isolation: isolate;
+    pointer-events: none;
+}
+.notification-modal-overlay{
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background-color: hsl(0 0% 100% / 0.8);
+    z-index: -1;
+}
+.notification-modal-content{
+    padding: .5rem;
+}
+.notification-message{
+    color: black;
+    font-size: .6rem;
+    text-transform: uppercase;
+}
+/*
+--------------------------------------------------------
+
+            MY IMAGE 
+
+--------------------------------------------------------
+*/
+.myimage_wrapper{
+    position: absolute;
+    width: 200px;
+    opacity: 0;
+}
+.myimage{
+    width: 100%;
+    filter: brightness(90%);
+}
+@keyframes slideImageUp {
+    0%{
+        translate: 0px 300px;
+    }
+    50%,90%{
+        translate: 0px 75px;
+    }
+    100%{
+        translate: 0px 300px;
+    }
+    
+}
+@keyframes slideImageDown {
+    0%{
+        translate: 0px -300px;
+    }
+    50%,90%{
+        translate: 0px -75px;
+    }
+    100%{
+        translate: 0px -300px;
+    }
+    
+}
+@keyframes slideImageRight {
+    0%{
+        translate: 200px 0px;
+    }
+    50%,90%{
+        translate: 50px 0px;
+    }
+    100%{
+        translate: 200px 0px;
+    }
+    
+}
+@keyframes slideImageLeft {
+    0%{
+        translate: -200px 0px;
+    }
+    50%,90%{
+        translate: -50px 0px;
+    }
+    100%{
+        translate: -200px 0px;
+    }
+    
+}
+/*
+--------------------------------------------------------
+
+            DEVICE RESPONSE
+
+--------------------------------------------------------
+*/
 
 @media only screen and (max-width: 900px) {
     main{
-        height: calc(90vh - var(--header-height) - 5px);
+        height: calc(100vh - var(--header-height) - 5px);
     } 
 }
