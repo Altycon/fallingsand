@@ -1,28 +1,28 @@
-const version = 17;
+const version = 18;
 const staticCacheName = `staticCache-${version}`;
 const imageCacheName = `imageCache-${version}`;
 const dynamicCacheName = `dynamicCache`;
 
 const assets = [
-    '/',
-    '/index.html',
-    '/main.css',
-    '/js/app.js',
-    '/js/falling_sand.js',
-    '/js/notification.js',
-    '/js/utilities.js',
-    '/manifest.json'
+    './',
+    './index.html',
+    './main.css',
+    './js/app.js',
+    './js/falling_sand.js',
+    './js/notification.js',
+    './js/utilities.js',
+    './manifest.json'
 ];
 
 const imageAssets = [
-    '/img/android-chrome-192x192.png',
-    '/img/android-chrome-512x512.png',
-    '/img/apple-touch-icon.png',
-    '/img/favicon-16x16.png',
-    '/img/favicon-32x32.png',
-    '/img/screenshot_fallingsand_323x703.png',
-    '/img/screenshot_fallingsand_718x332.png',
-    '/img/claydoublewave_edit_500x667.png'
+    './img/android-chrome-192x192.png',
+    './img/android-chrome-512x512.png',
+    './img/apple-touch-icon.png',
+    './img/favicon-16x16.png',
+    './img/favicon-32x32.png',
+    './img/screenshot_fallingsand_323x703.png',
+    './img/screenshot_fallingsand_718x332.png',
+    './img/claydoublewave_edit_500x667.png'
 ]
 
 self.addEventListener('install', (event)=> {
