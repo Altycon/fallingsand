@@ -69,6 +69,8 @@ const APP = {
 
             event.target.style.backgroundColor = 'cornflowerblue';
 
+            event.target.style.color = 'black';
+
         }else if(event.target.value === "true"){
 
             FallingSand.autoColor = false;
@@ -76,6 +78,8 @@ const APP = {
             event.target.value = "false";
 
             event.target.style.backgroundColor = 'black';
+
+            event.target.style.color = 'white';
         }
     },
     handleColorInput(event){
@@ -85,6 +89,8 @@ const APP = {
             if(button.value === "true"){
 
                 button.style.backgroundColor = 'black';
+
+                button.style.color = 'white';
 
                 button.value = "false";
             }

@@ -1,4 +1,4 @@
-const version = 6;
+const version = 14;
 const staticCacheName = `staticCache-${version}`;
 const imageCacheName = `imageCache-${version}`;
 const dynamicCacheName = `dynamicCache`;
@@ -22,6 +22,7 @@ const imageAssets = [
     '/img/favicon-32x32.png',
     '/img/screenshot_fallingsand_323x703.png',
     '/img/screenshot_fallingsand_718x332.png',
+    '/img/claydoublewave_edit_500x667.png'
 ]
 
 self.addEventListener('install', (event)=> {
@@ -45,21 +46,23 @@ self.addEventListener('install', (event)=> {
                     console.warn(`failed to updated ${staticCacheName}`,error);
 
                 }
-            ).then(
-                
+            )
+        }).then(
+            caches.open(imageCacheName).then( (cache)=> {
+
                 cache.addAll(imageAssets).then(
 
                     ()=> {
-
+    
                         console.log(`${imageCacheName} has been updated.`);
-
+    
                     }, (error) =>{
-
+    
                         console.warn(`failed to updated ${imageCacheName}`,error);
                     }
                 )
-            );
-        })
+            }) 
+        )
 
     );  
 
@@ -140,7 +143,7 @@ self.addEventListener('fetch', (event) => {
 
                 const type = fetchResponse.headers.get('content-type');
 
-                if(type && type.match(/^text\/css\/html/i)){
+                if(type && type.match(/^text\/css\/html\/js\/json/i)){
 
                     console.log(`saved a CSS file ${event.request.url}`);
 

@@ -57,9 +57,11 @@ body{
 }
 .header-primary > button[value=false]{
     background-color: black;
+    color: white;
 }
 .header-primary > button[value=true]{
     background-color: cornflowerblue;
+    color: black;
 }
 .header-primary > button:hover{
     background-color: hsl(0 0% 20%);
@@ -224,6 +226,6 @@ main{
 
 @media only screen and (max-width: 900px) {
     main{
-        height: calc(100vh - var(--header-height) - 5px);
+        height: calc(90vh - var(--header-height) - 5px);
     } 
 }

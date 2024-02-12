@@ -1,5 +1,5 @@
 {
-    "name": "Falling Sand",
+    "name": "Sandy",
     "short_name": "Sandy",
     "id": "/?source=pwa",
     "start_url": "/",
@@ -27,7 +27,8 @@
         {
             "src": "/img/android-chrome-512x512.png",
             "sizes": "512x512",
-            "type": "image/png"
+            "type": "image/png",
+            "purpose": "maskable"
         },
         {
             "src": "/img/apple-touch-icon.png",
