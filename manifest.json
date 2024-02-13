@@ -2,7 +2,7 @@
     "name": "Sandy",
     "short_name": "Sandy",
     "id": "/?source=pwa",
-    "start_url": "/fallingsand",
+    "start_url": "/fallingsand/",
     "icons": [
         {
             "src": "/img/apple-touch-icon.png",
