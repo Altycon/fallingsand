@@ -13,7 +13,7 @@
         {
             "src": "/favicon.ico",
             "sizes": "48x48",
-            "type": "image/png"
+            "type": "image/x-icon"
         },
         {
             "src": "/img/favicon-16x16.png",
