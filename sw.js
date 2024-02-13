@@ -1,4 +1,4 @@
-const version = 26;
+const version = 27;
 const staticCacheName = `staticCache-${version}`;
 const imageCacheName = `imageCache-${version}`;
 const dynamicCacheName = `dynamicCache`;
