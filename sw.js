@@ -1,4 +1,4 @@
-const version = 20;
+const version = 22;
 const staticCacheName = `staticCache-${version}`;
 const imageCacheName = `imageCache-${version}`;
 const dynamicCacheName = `dynamicCache`;
@@ -15,6 +15,7 @@ const assets = [
 ];
 
 const imageAssets = [
+    './img/apple-touch-icon.png',
     './img/android-chrome-192x192.png',
     './img/android-chrome-512x512.png',
     './img/favicon-16x16.png',
