@@ -1,4 +1,4 @@
-const version = 6;
+const version = 7;
 const staticCacheName = `staticCache-${version}`;
 const imageCacheName = `imageCache-${version}`;
 const dynamicCacheName = `dynamicCache`;
@@ -11,10 +11,7 @@ const assets = [
     './js/falling_sand.js',
     './js/notification.js',
     './js/utilities.js',
-    './manifest.json'
-];
-
-const imageAssets = [
+    './manifest.json',
     './img/apple-touch-icon.png',
     './img/android-chrome-192x192.png',
     './img/android-chrome-512x512.png',
@@ -24,6 +21,7 @@ const imageAssets = [
     './img/screenshot_fallingsand_718x332.png',
     './img/claydoublewave_edit_500x667.png'
 ];
+
 
 self.addEventListener('install', (event)=> {
 
@@ -47,22 +45,7 @@ self.addEventListener('install', (event)=> {
 
                 }
             )
-        }).then(
-            caches.open(imageCacheName).then( (cache)=> {
-
-                cache.addAll(imageAssets).then(
-
-                    ()=> {
-    
-                        console.log(`${imageCacheName} has been updated.`);
-    
-                    }, (error) =>{
-    
-                        console.warn(`failed to updated ${imageCacheName}`,error);
-                    }
-                )
-            }) 
-        )
+        })
 
     );  
 
@@ -80,7 +63,7 @@ self.addEventListener('activate', (event)=>{
 
                 keys.filter( (key) => {
 
-                    if(key != staticCacheName && key != imageCacheName){
+                    if(key != staticCacheName){
 
                         return true;
                     }
@@ -137,102 +120,83 @@ self.addEventListener('fetch', (event) => {
     // UGH I don't know how I should hanle this!!!! Fucking hell!!!!!
 
 
-    // const isOnline = self.navigator.onLine;
+    const isOnline = self.navigator.onLine;
 
-    // const url = new URL(event.request.url);
+    const url = new URL(event.request.url);
 
-    // const isImage = url.pathname.match(/\.(png|jpeg|jpg|gif)$/i);
+    const isImage = url.pathname.match(/\.(png|jpeg|jpg|gif)$/i);
 
-    // const isJSON = url.pathname.endsWith('.json');
+    const isJSON = url.pathname.endsWith('.json');
 
-    // const isCSS = url.pathname.endsWith('.css');
+    const isCSS = url.pathname.endsWith('.css');
 
-    // const isHTML = event.request.mode === 'navigate';
+    const isHTML = event.request.mode === 'navigate';
 
-    // const isJavaScript = url.pathname.endsWith('.js');
+    const isJavaScript = url.pathname.endsWith('.js');
 
-    // const selfUrl = new URL(self.location);
+    const selfUrl = new URL(self.location);
 
-    // const isExternal = event.request.mode === 'cors' || selfUrl.hostname !== url.hostname;
+    const isExternal = event.request.mode === 'cors' || selfUrl.hostname !== url.hostname;
 
-    // if(isOnline && !isExternal){
+    if(isOnline){
 
-    //     if(isHTML || isCSS || isJavaScript || isJSON){
+        event.respondWith( staleWhileRevalidate(event, staticCacheName) );
 
-    //         event.respondWith( staleWhileRevalidate(event, staticCacheName) );
+    }else{
 
-    //     }else if(isImage){
+        event.respondWith( cacheOnly(event) );
 
-    //         event.respondWith( staleWhileRevalidate(event, imageCacheName) );
+    }
 
-    //     }else{
+    // event.respondWith(
 
+    //     caches.match(event.request).then( (cacheResponse)=>{
 
-    //     }
+    //         return cacheResponse || fetch(event.request)
 
-    // }else if(isOnline && isExternal){
+    //         .then( async (fetchResponse)=> {
 
+    //             if(!fetchResponse || !fetchResponse.ok){
 
+    //                 return fetchResponse;
+    //             }
 
-    // }else if(!isOnline && isExternal){
+    //             const type = fetchResponse.headers.get('content-type');
 
+    //             if(type && type.includes('text/html')){
 
+    //                 console.log(`saved file ${event.request.url}`);
 
-    // }else{
+    //                 return caches.open(staticCacheName).then( cache => {
 
-    //     event.respondWith( cacheOnly(event) );
+    //                     cache.put(event.request, fetchResponse.clone());
 
-    // }
+    //                     return fetchResponse;
+    //                 })
 
-    event.respondWith(
+    //             }else if(type && type.startsWith('image')){
 
-        caches.match(event.request).then( (cacheResponse)=>{
+    //                 console.log(`saved aan IMAGE file ${event.request.url}`);
 
-            return cacheResponse || fetch(event.request)
+    //                 return caches.open(imageCacheName).then( (cache)=> {
 
-            .then( async (fetchResponse)=> {
+    //                     cache.put(event.request, fetchResponse.clone());
 
-                if(!fetchResponse || !fetchResponse.ok){
+    //                     return fetchResponse;
+    //                 })
 
-                    return fetchResponse;
-                }
+    //             }else{
 
-                const type = fetchResponse.headers.get('content-type');
+    //                 return caches.open(dynamicCacheName).then( (cache)=> {
 
-                if(type && type.includes('text/html')){
+    //                     cache.put(event.request, fetchResponse.clone());
 
-                    console.log(`saved file ${event.request.url}`);
-
-                    return caches.open(staticCacheName).then( cache => {
-
-                        cache.put(event.request, fetchResponse.clone());
-
-                        return fetchResponse;
-                    })
-
-                }else if(type && type.startsWith('image')){
-
-                    console.log(`saved aan IMAGE file ${event.request.url}`);
-
-                    return caches.open(imageCacheName).then( (cache)=> {
-
-                        cache.put(event.request, fetchResponse.clone());
-
-                        return fetchResponse;
-                    })
-
-                }else{
-
-                    return caches.open(dynamicCacheName).then( (cache)=> {
-
-                        cache.put(event.request, fetchResponse.clone());
-
-                        return fetchResponse;
-                    })
-                }
-            })
-        })
-    )
+    //                     return fetchResponse;
+    //                 })
+    //             }
+    //         })
+    //     })
+    // )
 
 });
 
