@@ -1,4 +1,4 @@
-const version = 13;
+const version = 14;
 const staticCacheName = `staticCache-${version}`;
 const imageCacheName = `imageCache-${version}`;
 const dynamicCacheName = `dynamicCache`;
@@ -200,9 +200,17 @@ self.addEventListener('fetch', (event) => {
 
 });
 
-function cacheOnly(event){
+async function cacheOnly(event){
 
-    return caches.match(event.request);
+    return caches.match(event.request).then( cacheResponse => {
+
+        return cacheResponse || new Response('This happened cause there is no cash', { 
+            headers: { 
+                'content-type': 'x-no-cache'
+            }
+        });
+
+    });
 
 };
 
