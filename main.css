@@ -107,7 +107,7 @@ label[for=FallingSandColorInput]::before{
     
 }
 main{
-    height: calc(100vh - var(--header-height) - 5px);
+    height: calc(100vh - var(--header-height));
 }
 
 /*
@@ -136,6 +136,8 @@ main{
     max-width: 350px;
     isolation: isolate;
     pointer-events: none;
+
+    display: none;
 }
 .notification-modal-overlay{
     position: absolute;
@@ -223,9 +225,3 @@ main{
 
 --------------------------------------------------------
 */
-
-@media only screen and (max-width: 900px) {
-    main{
-        height: calc(100vh - var(--header-height) - 5px);
-    } 
-}

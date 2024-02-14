@@ -1,4 +1,4 @@
-const version = 19;
+const version = 21;
 const staticCacheName = `staticCache-${version}`;
 const imageCacheName = `imageCache-${version}`;
 const dynamicCacheName = `dynamicCache`;
@@ -21,6 +21,25 @@ const assets = [
     '/fallingsand/img/screenshot_fallingsand_718x332.png',
     '/fallingsand/img/claydoublewave_edit_500x667.png'
 ];
+
+// const assets = [
+//     '/',
+//     '/index.html',
+//     '/main.css',
+//     '/js/app.js',
+//     '/js/falling_sand.js',
+//     '/js/notification.js',
+//     '/js/utilities.js',
+//     '/manifest.json',
+//     '/img/apple-touch-icon.png',
+//     '/img/android-chrome-192x192.png',
+//     '/img/android-chrome-512x512.png',
+//     '/img/favicon-16x16.png',
+//     '/img/favicon-32x32.png',
+//     '/img/Screenshot_fallingsand_319x688.png',
+//     '/img/screenshot_fallingsand_718x332.png',
+//     '/img/claydoublewave_edit_500x667.png'
+// ];
 
 
 self.addEventListener('install', (event)=> {
@@ -148,67 +167,13 @@ self.addEventListener('fetch', (event) => {
 
     }
 
-    // event.respondWith(
-
-    //     caches.match(event.request).then( (cacheResponse)=>{
-
-    //         return cacheResponse || fetch(event.request)
-
-    //         .then( async (fetchResponse)=> {
-
-    //             if(!fetchResponse || !fetchResponse.ok){
-
-    //                 return fetchResponse;
-    //             }
-
-    //             const type = fetchResponse.headers.get('content-type');
-
-    //             if(type && type.includes('text/html')){
-
-    //                 console.log(`saved file ${event.request.url}`);
-
-    //                 return caches.open(staticCacheName).then( cache => {
-
-    //                     cache.put(event.request, fetchResponse.clone());
-
-    //                     return fetchResponse;
-    //                 })
-
-    //             }else if(type && type.startsWith('image')){
-
-    //                 console.log(`saved aan IMAGE file ${event.request.url}`);
-
-    //                 return caches.open(imageCacheName).then( (cache)=> {
-
-    //                     cache.put(event.request, fetchResponse.clone());
-
-    //                     return fetchResponse;
-    //                 })
-
-    //             }else{
-
-    //                 return caches.open(dynamicCacheName).then( (cache)=> {
-
-    //                     cache.put(event.request, fetchResponse.clone());
-
-    //                     return fetchResponse;
-    //                 })
-    //             }
-    //         })
-    //     })
-    // )
-
 });
 
 async function cacheOnly(event){
 
     return caches.match(event.request).then( cacheResponse => {
 
-        return cacheResponse || new Response('This happened cause there is no cash', { 
-            headers: { 
-                'content-type': 'x-no-cache'
-            }
-        });
+        return cacheResponse || caches.match('/fallingsand/404.html').then( response => response );
 
     });
 
