@@ -1,25 +1,25 @@
-const version = 15;
+const version = 16;
 const staticCacheName = `staticCache-${version}`;
 const imageCacheName = `imageCache-${version}`;
 const dynamicCacheName = `dynamicCache`;
 
 const assets = [
-    './',
-    './index.html',
-    './main.css',
-    './js/app.js',
-    './js/falling_sand.js',
-    './js/notification.js',
-    './js/utilities.js',
-    './manifest.json',
-    './img/apple-touch-icon.png',
-    './img/android-chrome-192x192.png',
-    './img/android-chrome-512x512.png',
-    './img/favicon-16x16.png',
-    './img/favicon-32x32.png',
-    './img/screenshot_fallingsand_323x703.png',
-    './img/screenshot_fallingsand_718x332.png',
-    './img/claydoublewave_edit_500x667.png'
+    '/fallingsand/',
+    '/fallingsand/index.html',
+    '/fallingsand/main.css',
+    '/fallingsand/js/app.js',
+    '/fallingsand/js/falling_sand.js',
+    '/fallingsand/js/notification.js',
+    '/fallingsand/js/utilities.js',
+    '/fallingsand/manifest.json',
+    '/fallingsand/img/apple-touch-icon.png',
+    '/fallingsand/img/android-chrome-192x192.png',
+    '/fallingsand/img/android-chrome-512x512.png',
+    '/fallingsand/img/favicon-16x16.png',
+    '/fallingsand/img/favicon-32x32.png',
+    '/fallingsand/img/screenshot_fallingsand_323x703.png',
+    '/fallingsand/img/screenshot_fallingsand_718x332.png',
+    '/fallingsand/img/claydoublewave_edit_500x667.png'
 ];
 
 
