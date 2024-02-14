@@ -243,7 +243,7 @@ const APP = {
             navigator.serviceWorker.register(window.location.href + 'sw.js', {
 
                     //updateViaCache: 'none',
-                    scope: '/'
+                    scope: '/fallingsand/'
 
                 })
                 .then( (registration) => {
