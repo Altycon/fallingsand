@@ -238,10 +238,10 @@ const APP = {
 
             console.log('service worker found')
 
-            navigator.serviceWorker.register('/sw.js', {
+            navigator.serviceWorker.register('/fallingsand/sw.js', {
 
                     //updateViaCache: 'none',
-                    scope: '/'
+                    scope: '/fallingsand/'
 
                 })
                 .then( (registration) => {
