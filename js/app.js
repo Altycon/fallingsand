@@ -236,9 +236,11 @@ const APP = {
 
         if(hasServiceWorker()){
 
-            console.log('service worker found')
+            console.log('service worker found');
 
-            navigator.serviceWorker.register('/sw.js', {
+            
+
+            navigator.serviceWorker.register(window.location.href + 'sw.js', {
 
                     //updateViaCache: 'none',
                     scope: '/'
