@@ -1,4 +1,4 @@
-const version = 16;
+const version = 17;
 const staticCacheName = `staticCache-${version}`;
 const imageCacheName = `imageCache-${version}`;
 const dynamicCacheName = `dynamicCache`;
@@ -114,7 +114,7 @@ self.addEventListener('message', (event)=>{
 
 self.addEventListener('fetch', (event) => {
 
-    console.log(`fetch request for: ${event.request.url} --- MODE: ${event.request.mode}`);
+   // console.log(`fetch request for: ${event.request.url} --- MODE: ${event.request.mode}`);
     
 
     // UGH I don't know how I should hanle this!!!! Fucking hell!!!!!
