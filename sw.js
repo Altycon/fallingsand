@@ -1,4 +1,4 @@
-const version = 18;
+const version = 19;
 const staticCacheName = `staticCache-${version}`;
 const imageCacheName = `imageCache-${version}`;
 const dynamicCacheName = `dynamicCache`;
@@ -17,7 +17,7 @@ const assets = [
     '/fallingsand/img/android-chrome-512x512.png',
     '/fallingsand/img/favicon-16x16.png',
     '/fallingsand/img/favicon-32x32.png',
-    '/fallingsand/img/screenshot_fallingsand_323x703.png',
+    '/fallingsand/img/Screenshot_fallingsand_319x688.png',
     '/fallingsand/img/screenshot_fallingsand_718x332.png',
     '/fallingsand/img/claydoublewave_edit_500x667.png'
 ];
