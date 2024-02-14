@@ -1,4 +1,4 @@
-const version = 36;
+const version = 4;
 const staticCacheName = `staticCache-${version}`;
 const imageCacheName = `imageCache-${version}`;
 const dynamicCacheName = `dynamicCache`;
@@ -131,21 +131,77 @@ self.addEventListener('message', (event)=>{
 
 self.addEventListener('fetch', (event) => {
 
-    console.log(`fetch request for: ${event.request.url}`);
+    console.log(`fetch request for: ${event.request.url} --- MODE: ${event.request.mode}`);
+    
+
+    // UGH I don't know how I should hanle this!!!! Fucking hell!!!!!
+
+
+    // const isOnline = self.navigator.onLine;
+
+    // const url = new URL(event.request.url);
+
+    // const isImage = url.pathname.match(/\.(png|jpeg|jpg|gif)$/i);
+
+    // const isJSON = url.pathname.endsWith('.json');
+
+    // const isCSS = url.pathname.endsWith('.css');
+
+    // const isHTML = event.request.mode === 'navigate';
+
+    // const isJavaScript = url.pathname.endsWith('.js');
+
+    // const selfUrl = new URL(self.location);
+
+    // const isExternal = event.request.mode === 'cors' || selfUrl.hostname !== url.hostname;
+
+    // if(isOnline && !isExternal){
+
+    //     if(isHTML || isCSS || isJavaScript || isJSON){
+
+    //         event.respondWith( staleWhileRevalidate(event, staticCacheName) );
+
+    //     }else if(isImage){
+
+    //         event.respondWith( staleWhileRevalidate(event, imageCacheName) );
+
+    //     }else{
+
+
+    //     }
+
+    // }else if(isOnline && isExternal){
+
+
+
+    // }else if(!isOnline && isExternal){
+
+
+
+    // }else{
+
+    //     event.respondWith( cacheOnly(event) );
+
+    // }
 
     event.respondWith(
 
-        caches.match(event.request).then( (cacheResonse)=>{
+        caches.match(event.request).then( (cacheResponse)=>{
 
-            return cacheResonse || fetch(event.request)
+            return cacheResponse || fetch(event.request)
 
             .then( async (fetchResponse)=> {
 
+                if(!fetchResponse || !fetchResponse.ok){
+
+                    return fetchResponse;
+                }
+
                 const type = fetchResponse.headers.get('content-type');
 
-                if(type && type.match(/^text\/css\/html\/js\/json/i)){
+                if(type && type.includes('text/html')){
 
-                    console.log(`saved a CSS file ${event.request.url}`);
+                    console.log(`saved file ${event.request.url}`);
 
                     return caches.open(staticCacheName).then( cache => {
 
@@ -154,7 +210,7 @@ self.addEventListener('fetch', (event) => {
                         return fetchResponse;
                     })
 
-                }else if(type && type.match(/^image\//i)){
+                }else if(type && type.startsWith('image')){
 
                     console.log(`saved aan IMAGE file ${event.request.url}`);
 
@@ -179,6 +235,82 @@ self.addEventListener('fetch', (event) => {
     )
 
 });
+
+function cacheOnly(event){
+
+    return caches.match(event.request);
+
+};
+
+async function cacheFirst(event){
+
+    return caches.match(event.request).then( cacheResponse => {
+
+        return cacheResponse || fetch(event.request);
+
+    });
+
+};
+
+function networkOnly(event){
+
+    return fetch(event.request);
+
+};
+
+async function networkFirst(event){
+
+    return fetch(event.request).then( fetchResponse => {
+
+        if(fetchResponse.ok) return fetchResponse;
+
+        return caches.match(event.request);
+    });
+};
+
+async function staleWhileRevalidate(event, cacheName){
+
+    return caches.match(event.request).then( cacheResponse => {
+
+        return cacheResponse || fetch(event.request).then( async response => {
+
+            if(!response || response.status === 404 || response.status !== 200){
+
+                return caches.match('404.html');
+            }
+
+            return caches.open(cacheName).then( cache => {
+
+                cache.put(event.request, response.clone());
+
+                return response;
+            })
+            
+        });
+    });
+
+};
+
+async function networkRevalidateAndCache(event, cacheName){
+
+    return fetch(event.request).then( async fetchResponse => {
+
+        if(fetchResponse.ok){
+
+            return caches.open(cacheName).then( cache => {
+
+                cache.put(event.request, fetchResponse.clone());
+
+                return fetchResponse;
+            });
+
+        }else{
+
+            return caches.match(event.request);
+
+        }
+    });
+};
 
 async function sendServiceWorkerMessage(message){
 
