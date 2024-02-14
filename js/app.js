@@ -240,7 +240,7 @@ const APP = {
 
             
 
-            navigator.serviceWorker.register(window.location.href + 'sw.js', {
+            navigator.serviceWorker.register('/fallingsand/sw.js', {
 
                     //updateViaCache: 'none',
                     scope: '/fallingsand/'
