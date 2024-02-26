@@ -1,16 +1,12 @@
-const version = 21;
+const version = 1;
 const staticCacheName = `staticCache-${version}`;
-const imageCacheName = `imageCache-${version}`;
-const dynamicCacheName = `dynamicCache`;
 
 const assets = [
     '/fallingsand/',
     '/fallingsand/index.html',
     '/fallingsand/main.css',
     '/fallingsand/js/app.js',
-    '/fallingsand/js/falling_sand.js',
-    '/fallingsand/js/notification.js',
-    '/fallingsand/js/utilities.js',
+    '/fallingsand/js/sand.js',
     '/fallingsand/manifest.json',
     '/fallingsand/img/apple-touch-icon.png',
     '/fallingsand/img/android-chrome-192x192.png',
@@ -22,79 +18,23 @@ const assets = [
     '/fallingsand/img/claydoublewave_edit_500x667.png'
 ];
 
-// const assets = [
-//     '/',
-//     '/index.html',
-//     '/main.css',
-//     '/js/app.js',
-//     '/js/falling_sand.js',
-//     '/js/notification.js',
-//     '/js/utilities.js',
-//     '/manifest.json',
-//     '/img/apple-touch-icon.png',
-//     '/img/android-chrome-192x192.png',
-//     '/img/android-chrome-512x512.png',
-//     '/img/favicon-16x16.png',
-//     '/img/favicon-32x32.png',
-//     '/img/Screenshot_fallingsand_319x688.png',
-//     '/img/screenshot_fallingsand_718x332.png',
-//     '/img/claydoublewave_edit_500x667.png'
-// ];
-
-
 self.addEventListener('install', (event)=> {
-
-    //installed
 
     console.log(`Version ${version} installed.`);
 
-    event.waitUntil(
-
-        caches.open(staticCacheName).then( (cache) => {
-
-            cache.addAll(assets).then( 
-
-                ()=> {
-
-                    console.log(`${staticCacheName} has been updated.`);
-
-                }, (error)=> {
-
-                    console.warn(`failed to updated ${staticCacheName}`,error);
-
-                }
-            )
-        })
-
-    );  
+    event.waitUntil( cacheAssets(staticCacheName) );  
 
 });
+
 
 self.addEventListener('activate', (event)=>{
 
     console.log('activated');
 
-    event.waitUntil(
-
-        caches.keys().then( (keys) => {
-
-            return Promise.all(
-
-                keys.filter( (key) => {
-
-                    if(key != staticCacheName){
-
-                        return true;
-                    }
-                })
-                .map( (key) => caches.delete(key))
-
-            );
-
-        })
-    );
+    event.waitUntil( cleanCache(staticCacheName) );
 
 });
+
 
 self.addEventListener('message', (event)=>{
 
@@ -104,40 +44,18 @@ self.addEventListener('message', (event)=>{
 
     if('checkOnline' in data){
 
-        const testUrl = `/test_online.txt`;
-        
-        const request = new Request(testUrl, {
-
-            method: 'HEAD'
-        });
-
-        event.waitUntil(
-
-            fetch(request).then( (response)=> {
-
-                console.log('Able to get the test data headers');
-
-                return sendServiceWorkerMessage({ isOnline: true });
-
-            }, (error)=> {
-
-                console.log('Failed to fetch test data headers',error);
-
-                return sendServiceWorkerMessage({ isOnline: false });
-
-            })
-        );
+        event.waitUntil( requestDataToCheckisOnline() );
     }
     
 });
 
+
+
+
+
 self.addEventListener('fetch', (event) => {
 
-   // console.log(`fetch request for: ${event.request.url} --- MODE: ${event.request.mode}`);
-    
-
-    // UGH I don't know how I should hanle this!!!! Fucking hell!!!!!
-
+    console.log(`fetch request for: ${event.request.url} --- MODE: ${event.request.mode}`);
 
     const isOnline = self.navigator.onLine;
 
@@ -169,11 +87,86 @@ self.addEventListener('fetch', (event) => {
 
 });
 
+function cacheAssets(cacheName){
+
+    caches.open(cacheName).then( (cache) => {
+
+        cache.addAll(assets).then( response => {
+
+            console.log(`${cacheName} has been updated.`);
+
+            return response;
+
+        }).catch( error => {
+
+            console.warn(`Failed to updated ${cacheName}`,error);
+
+        });
+    });
+
+
+};
+
+function cleanCache(cacheName){
+
+    caches.keys().then( (keys) => {
+
+        return Promise.all(
+
+            keys.filter( (key) => key != cacheName).map( (key) => caches.delete(key))
+
+        );
+
+    })
+};
+
+async function sendServiceWorkerMessage(message){
+
+    const allClients = await clients.matchAll({ includeUncontrolled: true });
+
+    return Promise.all(
+
+        allClients.map( (client)=> {
+
+            if('isOnline' in message){
+    
+                console.log('tell the browser if online');
+            }
+            
+            return client.postMessage(message);
+
+        })
+    );
+};
+
+function requestDataToCheckisOnline(){
+
+    fetch(new Request(`/fallingsand/test_online.txt`, {method: 'HEAD'})).then( ()=> {
+
+        console.log('Able to get the test data headers');
+
+        return sendServiceWorkerMessage({ isOnline: true });
+
+    }, (error)=> {
+
+        console.log('Failed to fetch test data headers',error);
+
+        return sendServiceWorkerMessage({ isOnline: false });
+
+    });
+};
+
 async function cacheOnly(event){
 
     return caches.match(event.request).then( cacheResponse => {
 
-        return cacheResponse || caches.match('/fallingsand/404.html').then( response => response );
+        return cacheResponse || 
+        
+        caches.match('/404.html')
+        
+        .then( response => response )
+        
+        .catch( error => console.warn(`Failed to retrieve 404: ${error}`));
 
     });
 
@@ -213,7 +206,7 @@ async function staleWhileRevalidate(event, cacheName){
 
             if(!response || response.status === 404 || response.status !== 200){
 
-                return caches.match('404.html');
+                return caches.match('/fallingsand/404.html').then( response => response );
             }
 
             return caches.open(cacheName).then( cache => {
@@ -249,21 +242,3 @@ async function networkRevalidateAndCache(event, cacheName){
     });
 };
 
-async function sendServiceWorkerMessage(message){
-
-    const allClients = await clients.matchAll({ includeUncontrolled: true });
-
-    return Promise.all(
-
-        allClients.map( (client)=> {
-
-            if('inOnline' in message){
-    
-                console.log('tell the browser if online');
-            }
-            
-            return client.postMessage(message);
-
-        })
-    );
-};

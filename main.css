@@ -137,7 +137,7 @@ main{
     isolation: isolate;
     pointer-events: none;
 
-    display: none;
+    /* display: none; */
 }
 .notification-modal-overlay{
     position: absolute;
