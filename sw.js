@@ -1,4 +1,4 @@
-const version = 1;
+const version = 8;
 const staticCacheName = `staticCache-${version}`;
 
 const assets = [
@@ -20,7 +20,7 @@ const assets = [
 
 self.addEventListener('install', (event)=> {
 
-    console.log(`Version ${version} installed.`);
+    //console.log(`Version ${version} installed.`);
 
     event.waitUntil( cacheAssets(staticCacheName) );  
 
@@ -29,7 +29,7 @@ self.addEventListener('install', (event)=> {
 
 self.addEventListener('activate', (event)=>{
 
-    console.log('activated');
+    //console.log('activated');
 
     event.waitUntil( cleanCache(staticCacheName) );
 
@@ -40,7 +40,7 @@ self.addEventListener('message', (event)=>{
 
     const data = event.data;
 
-    console.log('SW received', data);
+    //console.log('SW received', data);
 
     if('checkOnline' in data){
 
@@ -55,7 +55,7 @@ self.addEventListener('message', (event)=>{
 
 self.addEventListener('fetch', (event) => {
 
-    console.log(`fetch request for: ${event.request.url} --- MODE: ${event.request.mode}`);
+    //console.log(`fetch request for: ${event.request.url} --- MODE: ${event.request.mode}`);
 
     const isOnline = self.navigator.onLine;
 
@@ -93,7 +93,7 @@ function cacheAssets(cacheName){
 
         cache.addAll(assets).then( response => {
 
-            console.log(`${cacheName} has been updated.`);
+            //console.log(`${cacheName} has been updated.`);
 
             return response;
 
@@ -130,7 +130,7 @@ async function sendServiceWorkerMessage(message){
 
             if('isOnline' in message){
     
-                console.log('tell the browser if online');
+                //console.log('tell the browser if online');
             }
             
             return client.postMessage(message);
@@ -143,13 +143,13 @@ function requestDataToCheckisOnline(){
 
     fetch(new Request(`/fallingsand/test_online.txt`, {method: 'HEAD'})).then( ()=> {
 
-        console.log('Able to get the test data headers');
+        //console.log('Able to get the test data headers');
 
         return sendServiceWorkerMessage({ isOnline: true });
 
     }, (error)=> {
 
-        console.log('Failed to fetch test data headers',error);
+        //console.log('Failed to fetch test data headers',error);
 
         return sendServiceWorkerMessage({ isOnline: false });
 

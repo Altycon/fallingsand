@@ -19,6 +19,7 @@ const APP = {
     fallingSandContext: undefined,
     DPI: devicePixelRatio,
     autoColor: true,
+    sandHue: undefined,
 
     notify(message){
 
@@ -55,7 +56,7 @@ const APP = {
 
             APP.serviceWorker = registration.installing || registration.waiting || registration.active;
 
-            console.log('service worker registered');
+            //console.log('service worker registered');
 
         })
         .catch( (error)=> {
@@ -67,7 +68,7 @@ const APP = {
         // see if page currently has service worker
         if(navigator.serviceWorker.controller){
 
-            console.log('Serive worker is installed');
+            //console.log('Serive worker is installed');
 
             navigator.serviceWorker.controller.postMessage({
                 
@@ -78,7 +79,7 @@ const APP = {
 
         navigator.serviceWorker.oncontrollerchange = (event)=>{
 
-            console.log('New service worker activated', event);
+            //console.log('New service worker activated', event);
         };
 
         navigator.serviceWorker.addEventListener('message', ({ data })=>{
@@ -141,6 +142,17 @@ const APP = {
             Sand.hue += 0.5;
 
             APP.setActiveColorDisplay(Sand.hue);
+
+        }else{
+
+            if(APP.sandHue === undefined){
+
+                APP.sandHue = Sand.hue;
+            }
+
+            const rand = Math.floor(Math.random() * 10)
+
+            Sand.hue = APP.sandHue + (rand * (Math.random() < 0.5 ? -1:1));
         }
         
         Sand.addSand(
@@ -156,7 +168,7 @@ const APP = {
 
         if(event.target.value === "false"){
     
-            FallingSand.autoColor = true;
+            APP.autoColor = true;
 
             event.target.value = "true";
 
@@ -164,9 +176,11 @@ const APP = {
 
             event.target.style.color = 'black';
 
+            APP.sandHue = undefined;
+
         }else if(event.target.value === "true"){
 
-            FallingSand.autoColor = false;
+            APP.autoColor = false;
 
             event.target.value = "false";
 
@@ -192,7 +206,9 @@ const APP = {
     
             Sand.hue = Number(event.target.value);
     
-            APP.setActiveColorDisplay(Sand.hue);   
+            APP.setActiveColorDisplay(Sand.hue);
+
+            APP.sandHue = undefined;   
 
     },
     
@@ -336,7 +352,7 @@ const APP = {
 
         APP.initializeFallingSandCanvas();
 
-        Sand.init(APP.fallingSandCanvas, innerWidth < 500 ? 5:2);
+        Sand.init(APP.fallingSandCanvas, innerWidth < 500 ? 5:4);
 
         APP.setActiveColorDisplay(1);
 

@@ -11,7 +11,7 @@ export const Sand = {
     grid: undefined,
     nextGeneration: undefined,
     hue: 1,
-    spread: 5,
+    spread: 10,
 
 init(sandCanvas,initialResolution){
     Sand.canvas = sandCanvas,
@@ -118,10 +118,6 @@ update(){
 
                 Sand.nextGeneration[downIndex].gravity = cell.gravity;
 
-                // downCell.state = 1;
-
-                // cell.state = 0;
-
             }else if(leftCell && leftCell.state === 0){
 
                 Sand.nextGeneration[i].state = 0;
@@ -132,10 +128,6 @@ update(){
 
                 Sand.nextGeneration[leftIndex].gravity = cell.gravity;
 
-                // leftCell.state = 1;
-
-                // cell.state = 0;
-
             }else if(rightCell && rightCell.state === 0){
 
                 Sand.nextGeneration[i].state = 0;
@@ -145,10 +137,6 @@ update(){
                 Sand.nextGeneration[rightIndex].hue = cell.hue;
 
                 Sand.nextGeneration[rightIndex].gravity = cell.gravity;
-
-                // rightCell.state = 1;
-
-                // cell.state = 0;
 
             }else{
 
