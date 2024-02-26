@@ -11,7 +11,7 @@ export const Sand = {
     grid: undefined,
     nextGeneration: undefined,
     hue: 1,
-    spread: 10,
+    spread: 5,
 
 init(sandCanvas,initialResolution){
     Sand.canvas = sandCanvas,
