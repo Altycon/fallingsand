@@ -150,13 +150,12 @@ const APP = {
                 Sand.hue += 0.5;
 
                 APP.setActiveColorDisplay(Sand.hue);
+
             }else{
 
-                if(APP.sandHue === undefined) APP.sandHue = Sand.hue;
+                if(Sand.hueCenter === undefined) Sand.hueCenter = Sand.hue;
     
-                const rand = Math.floor(Math.random() * 10)
-    
-                Sand.hue = APP.sandHue + (rand * (Math.random() < 0.5 ? -1:1));
+                Sand.hue = Sand.hueCenter + Sand.rangeValues[Math.floor(Math.random()*Sand.rangeValues.length)];
             }
 
             Sand.addSand(
@@ -179,7 +178,15 @@ const APP = {
 
             event.target.style.color = 'black';
 
-            APP.sandHue = undefined;
+            if(APP.worker){
+
+                APP.worker.postMessage({ action: 'change_hue', removeCenter: true })
+
+            }else{
+
+                APP.sandHue = undefined;
+
+            }
 
         }else if(event.target.value === "true"){
 
@@ -190,6 +197,14 @@ const APP = {
             event.target.style.backgroundColor = 'black';
 
             event.target.style.color = 'white';
+
+            if(APP.worker){
+
+                const colorInput = document.querySelector('#FallingSandColorInput')
+
+                APP.worker.postMessage({ action: 'change_hue', hue: Number(colorInput.value)})
+
+            }
         }
     },
     handleColorInput(event){

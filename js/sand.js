@@ -11,8 +11,10 @@ export const Sand = {
     grid: undefined,
     nextGeneration: undefined,
     circleSize: undefined,
+    hueCenter: undefined,
     hue: 1,
-    spread: 10,
+    rangeValues: [-10,-9,-8,-7,-6,-5,-4,-3,-2,-1,0,1,2,3,4,5,6,7,8,9,10],
+    spread: 5,
     direction: 1,
     TWO_PI: Math.PI*2,
 
@@ -95,7 +97,7 @@ update(){
         const row = Math.floor(i / Sand.columns);
         const column = i % Sand.columns;
 
-        if(cell.state > 0){
+        if(cell.state === 1){
 
             const downIndex = (row + cell.gravity) * Sand.columns + column;
 
@@ -171,7 +173,7 @@ renderGrid(){
 
         if(cell.state === 1){
 
-            Sand.context.fillStyle = `hsl(${cell.hue} 100% 50%)`;
+            Sand.context.fillStyle = `hsl(${cell.hue} 80% 50%)`;
 
             Sand.becomeSquare(col,row);
 

@@ -13,7 +13,18 @@ self.addEventListener('message', (event)=>{
 
                 const { positionX, positionY, hueIncrease } = data;
 
-                if(hueIncrease) Sand.hue += 0.5;
+                if(hueIncrease){
+
+                    Sand.hue += 0.5;
+
+                }else{
+
+                    if(Sand.hueCenter === undefined) Sand.hueCenter = Sand.hue;
+    
+                    Sand.hue = Sand.hueCenter + Sand.rangeValues[Math.floor(Math.random()*Sand.rangeValues.length)];
+                }
+
+                self.postMessage({ action: 'change_hue', hue: Sand.hue });
 
                 Sand.addSand(positionX, positionY)
 
@@ -21,7 +32,17 @@ self.addEventListener('message', (event)=>{
 
             case 'change_hue':
 
-                Sand.hue = data.hue;
+                if('removeCenter' in data ){
+
+                    Sand.hueCenter = undefined;
+
+                }else{
+
+                    Sand.hue = data.hue;
+
+                    Sand.hueCenter = Sand.hue;
+
+                }
 
                 self.postMessage({ action: 'change_hue', hue: Sand.hue });
 

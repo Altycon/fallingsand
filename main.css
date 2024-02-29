@@ -100,9 +100,9 @@ label[for=FallingSandColorInput]::before{
 
 .falling-sand-active-color-display{
     position: absolute;
-    bottom: 10%; right: 1%;
-    width: 12px;
-    height: 12px;
+    top: 100%; left: 0%;
+    width: 20px;
+    height: 20px;
     border-radius: 50%;
     
 }

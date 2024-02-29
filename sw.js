@@ -1,4 +1,4 @@
-const version = 11;
+const version = 15;
 const staticCacheName = `staticCache-${version}`;
 
 const assets = [
@@ -141,7 +141,7 @@ async function sendServiceWorkerMessage(message){
 
 function requestDataToCheckisOnline(){
 
-    fetch(new Request(`/test_online.txt`, {method: 'HEAD'})).then( ()=> {
+    fetch(new Request(`/fallingsand/test_online.txt`, {method: 'HEAD'})).then( ()=> {
 
         //console.log('Able to get the test data headers');
 
