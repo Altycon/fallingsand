@@ -17,6 +17,8 @@ const APP = {
     indexedDatabse: undefined,
     fallingSandCanvas: undefined,
     fallingSandContext: undefined,
+    canvasTop: undefined,
+    canvasLeft: undefined,
     DPI: devicePixelRatio,
     autoColor: true,
     sandHue: undefined,
@@ -47,11 +49,7 @@ const APP = {
 
     registerServiceWorker(){
 
-        navigator.serviceWorker.register('/fallingsand/sw.js', {
-
-            scope: '/fallingsand/'
-
-        })
+        navigator.serviceWorker.register('/fallingsand/sw.js', { scope: '/fallingsand/' })
         .then( (registration) => {
 
             APP.serviceWorker = registration.installing || registration.waiting || registration.active;
@@ -133,35 +131,40 @@ const APP = {
 
         event.preventDefault();
 
-        const { target, clientX, clientY } = APP.isMobile ? event.touches[0]:event;
+        const { clientX, clientY } = APP.isMobile ? event.touches[0]:event;
 
-        const rect = target.getBoundingClientRect();
+        if(APP.worker){
+    
+            APP.worker.postMessage({
 
-        if(APP.autoColor){
-
-            Sand.hue += 0.5;
-
-            APP.setActiveColorDisplay(Sand.hue);
+                action: 'add',
+                positionX: Math.floor(clientX - APP.canvasLeft) * APP.DPI,
+                positionY: Math.floor(clientY - APP.canvasTop) * APP.DPI,
+                hueIncrease: APP.autoColor          
+            });
 
         }else{
 
-            if(APP.sandHue === undefined){
+            if(APP.autoColor){
 
-                APP.sandHue = Sand.hue;
+                Sand.hue += 0.5;
+
+                APP.setActiveColorDisplay(Sand.hue);
+            }else{
+
+                if(APP.sandHue === undefined) APP.sandHue = Sand.hue;
+    
+                const rand = Math.floor(Math.random() * 10)
+    
+                Sand.hue = APP.sandHue + (rand * (Math.random() < 0.5 ? -1:1));
             }
 
-            const rand = Math.floor(Math.random() * 10)
+            Sand.addSand(
 
-            Sand.hue = APP.sandHue + (rand * (Math.random() < 0.5 ? -1:1));
+                Math.floor(clientX - APP.canvasLeft) * APP.DPI, 
+                Math.floor(clientY - APP.canvasTop) * APP.DPI
+            );
         }
-        
-        Sand.addSand(
-
-            Math.floor(clientX - rect.left) * APP.DPI, 
-            Math.floor(clientY - rect.top) * APP.DPI
-        );
-
-        //console.log(Sand.hue)
 
     },
     handleAutoColorSwitch(event){
@@ -204,11 +207,21 @@ const APP = {
     
             APP.autoColor = false;
     
-            Sand.hue = Number(event.target.value);
-    
-            APP.setActiveColorDisplay(Sand.hue);
+            if(APP.worker){
 
-            APP.sandHue = undefined;   
+                APP.setActiveColorDisplay(event.target.value);
+
+                APP.worker.postMessage({ action: 'change_hue', hue: Number(event.target.value)})
+
+            }else{
+
+                Sand.hue = Number(event.target.value);
+
+                APP.setActiveColorDisplay(Sand.hue);
+
+                APP.sandHue = undefined;
+
+            }           
 
     },
     
@@ -216,9 +229,17 @@ const APP = {
 
         if(confirm('Are you sure you want to reset the image?')){
 
-            Sand.clearDisplay();
+            if(APP.worker){
+
+                APP.worker.postMessage({ action: 'reset'})
+
+            }else{
+
+                Sand.clearDisplay();
     
-            Sand.resetGrid();
+                Sand.resetGrid();
+
+            }
         }
     },
 
@@ -333,8 +354,73 @@ const APP = {
 
         APP.fallingSandCanvas = APP.fixCanvas(document.querySelector(`#FallingSandCanvas`),APP.DPI);
 
-    },
+        const rect = APP.fallingSandCanvas.getBoundingClientRect();
 
+        APP.canvasTop = rect.top;
+        APP.canvasLeft = rect.left;
+
+    },
+    messageFromWorker(event){
+
+        const { data } = event;
+
+        switch(data.type){
+
+            case 'message':
+
+            console.log(data.message);
+
+            break;
+
+            case 'error':
+
+            console.log('WEBWORKER_MESSAGE_ERROR', data.message);
+
+            break;
+
+            default:
+
+            console.log(`No know "type" property in data.`);
+
+            break;
+        }
+    },
+    workerError(error){
+        
+        console.log('WEBWORKER_ERROR', error);
+
+    },
+    useWorker(){
+
+        APP.worker = new Worker('/fallingsand/worker.js', { type: 'module' });
+
+            const offScreenCanvas = APP.fallingSandCanvas.transferControlToOffscreen();
+
+            APP.worker.addEventListener('message', (event)=>{
+                const { data } = event;
+                
+                switch(data.action){
+
+                    case 'change_hue':
+
+                        APP.setActiveColorDisplay(data.hue);
+
+                    break;
+
+                    case 'start':
+
+                        APP.worker.postMessage({ action:'animate'});
+
+                    break;
+
+                }
+            });
+
+            APP.worker.addEventListener('error', APP.workerError);
+
+            APP.worker.postMessage({ action:'initialize', canvas: offScreenCanvas, screenWidth: innerWidth }, [offScreenCanvas]);
+
+    },
     init(){
 
         window.addEventListener('online', APP.goneOnline);
@@ -352,15 +438,25 @@ const APP = {
 
         APP.initializeFallingSandCanvas();
 
-        Sand.init(APP.fallingSandCanvas, innerWidth < 500 ? 5:4);
-
         APP.setActiveColorDisplay(1);
 
-        Sand.buildGrid();
+        if('Worker' in window && 'Blob' in window){
 
-        Sand.animate();
+            APP.useWorker();
+
+        }else{
+
+            Sand.init(APP.fallingSandCanvas, innerWidth < 500 ? 4:2);
+
+            Sand.buildGrid();
+
+            Sand.animate();
+
+        }
 
         APP.listen();
+
+
 
         APP.controlMyImage();
 

@@ -10,8 +10,11 @@ export const Sand = {
     gridLength: undefined,
     grid: undefined,
     nextGeneration: undefined,
+    circleSize: undefined,
     hue: 1,
     spread: 10,
+    direction: 1,
+    TWO_PI: Math.PI*2,
 
 init(sandCanvas,initialResolution){
     Sand.canvas = sandCanvas,
@@ -24,6 +27,7 @@ init(sandCanvas,initialResolution){
     Sand.gridLength = Sand.columns*Sand.rows;
     Sand.grid = new Array(Sand.gridLength);
     Sand.nextGeneration = new Array(Sand.gridLength);
+    Sand.circleSize = Sand.resolution*0.8;
     
 },
 loopGrid(callback){
@@ -49,7 +53,7 @@ addSand(positionX,positionY){
 
     if(!row || !column) return;
 
-    for(let i = -Sand.spread; i <= Sand.spread; i++){
+    for(let i = -Sand.spread; i <= Sand.spread; i+=2){
         for(let j = -Sand.spread; j < Sand.spread; j++){
 
             if(i === 0 || j === 0) continue;
@@ -60,28 +64,29 @@ addSand(positionX,positionY){
 
             const cell = Sand.grid[index];
 
-            if(cell.state === 0){
-                
-                if(Math.random() < 0.15){
+            if(cell.state === 0 && Math.random() < 0.15){ 
 
-                    cell.hue = Sand.hue;
+                cell.hue = Sand.hue;
 
-                    cell.state = 1;
+                cell.state = 1;
 
-                    cell.gravity = Math.floor(Math.random()*4) + 1;
-
-                }
+                cell.gravity = Math.floor(Math.random()*4) + 1;
 
             }
             
         }
     }
 },
+updateNextGenerationCell(index,state,hue,gravity){
+    Sand.nextGeneration[index].state = state;
+    Sand.nextGeneration[index].hue = hue;
+    Sand.nextGeneration[index].gravity = gravity;
+},
 update(){
     Sand.loopGrid((i)=>{
-        Sand.nextGeneration[i].state = Sand.grid[i].state;
-        Sand.nextGeneration[i].hue = Sand.grid[i].hue;
-        Sand.nextGeneration[i].gravity = Sand.grid[i].gravity;
+       
+        Sand.updateNextGenerationCell(i,Sand.grid[i].state,Sand.grid[i].hue,Sand.grid[i].gravity);
+
     });
 
     Sand.loopGrid((i)=>{
@@ -96,13 +101,11 @@ update(){
 
             const downCell = Sand.grid[downIndex];
 
-            let direction = 1;
+            if(Math.random() < 0.5) Sand.direction *= -1;
 
-            if(Math.random() < 0.5) direction *= -1;
+            const leftIndex = (row + 1) * Sand.columns + (column - Sand.direction);
 
-            const leftIndex = (row + 1) * Sand.columns + (column - direction);
-
-            const rightIndex = (row + 1) * Sand.columns + (column + direction);
+            const rightIndex = (row + 1) * Sand.columns + (column + Sand.direction);
 
             const leftCell = Sand.grid[leftIndex];
 
@@ -112,39 +115,23 @@ update(){
 
                 Sand.nextGeneration[i].state = 0;
 
-                Sand.nextGeneration[downIndex].state = 1;
-
-                Sand.nextGeneration[downIndex].hue = cell.hue;
-
-                Sand.nextGeneration[downIndex].gravity = cell.gravity;
+                Sand.updateNextGenerationCell(downIndex,1,cell.hue,cell.gravity);
 
             }else if(leftCell && leftCell.state === 0){
 
                 Sand.nextGeneration[i].state = 0;
 
-                Sand.nextGeneration[leftIndex].state = 1;
-
-                Sand.nextGeneration[leftIndex].hue = cell.hue;
-
-                Sand.nextGeneration[leftIndex].gravity = cell.gravity;
+                Sand.updateNextGenerationCell(leftIndex,1,cell.hue,cell.gravity);
 
             }else if(rightCell && rightCell.state === 0){
 
                 Sand.nextGeneration[i].state = 0;
 
-                Sand.nextGeneration[rightIndex].state = 1;
-
-                Sand.nextGeneration[rightIndex].hue = cell.hue;
-
-                Sand.nextGeneration[rightIndex].gravity = cell.gravity;
+                Sand.updateNextGenerationCell(rightIndex,1,cell.hue,cell.gravity);
 
             }else{
 
-                Sand.nextGeneration[i].state = cell.state;
-
-                Sand.nextGeneration[i].hue = cell.hue;
-
-                Sand.nextGeneration[i].gravity = cell.gravity;
+                Sand.updateNextGenerationCell(i,cell.state,cell.hue,cell.gravity);
 
             }
         }
@@ -155,6 +142,26 @@ update(){
         Sand.grid[i].gravity = Sand.nextGeneration[i].gravity;
     });
 },
+becomeSquare(col,row){
+    
+    Sand.context.fillRect(
+        col * Sand.resolution, 
+        row * Sand.resolution, 
+        Sand.resolution, 
+        Sand.resolution
+    );
+},
+becomeCircle(col,row){
+    Sand.context.beginPath();
+    Sand.context.arc(
+        (col * Sand.resolution) - (Sand.resolution*0.5), 
+        (row * Sand.resolution) - (Sand.resolution*0.5), 
+        Sand.circleSize, 
+        0,
+        Sand.TWO_PI
+    );
+    Sand.context.fill();
+},
 renderGrid(){
     Sand.context.clearRect(0,0,Sand.canvasWidth,Sand.canvasHeight);
     Sand.loopGrid((i)=>{
@@ -163,14 +170,11 @@ renderGrid(){
         const cell = Sand.grid[i];
 
         if(cell.state === 1){
-            
+
             Sand.context.fillStyle = `hsl(${cell.hue} 100% 50%)`;
-            Sand.context.fillRect(
-                col * Sand.resolution, 
-                row * Sand.resolution, 
-                Sand.resolution, 
-                Sand.resolution
-            );
+
+            Sand.becomeSquare(col,row);
+
         }
     });
     
@@ -183,7 +187,7 @@ animate(){
 
         const delta = timestamp - lasttime;
 
-        if(delta){
+        if(delta && lasttime !== timestamp){ // <== ?? lasttime !== timestamp?
 
             Sand.context.clearRect(0,0,Sand.canvasWidth,Sand.canvasHeight);
 
@@ -197,7 +201,7 @@ animate(){
 
         requestAnimationFrame(loop);
     }
-    loop();
+    loop(); //requestAnimationFrame(loop);?
 },
 clearDisplay(){
 

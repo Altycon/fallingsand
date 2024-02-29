@@ -1,4 +1,4 @@
-const version = 8;
+const version = 11;
 const staticCacheName = `staticCache-${version}`;
 
 const assets = [
@@ -59,21 +59,21 @@ self.addEventListener('fetch', (event) => {
 
     const isOnline = self.navigator.onLine;
 
-    const url = new URL(event.request.url);
+    //const url = new URL(event.request.url);
 
-    const isImage = url.pathname.match(/\.(png|jpeg|jpg|gif)$/i);
+    // const isImage = url.pathname.match(/\.(png|jpeg|jpg|gif)$/i);
 
-    const isJSON = url.pathname.endsWith('.json');
+    // const isJSON = url.pathname.endsWith('.json');
 
-    const isCSS = url.pathname.endsWith('.css');
+    // const isCSS = url.pathname.endsWith('.css');
 
-    const isHTML = event.request.mode === 'navigate';
+    // const isHTML = event.request.mode === 'navigate';
 
-    const isJavaScript = url.pathname.endsWith('.js');
+    // const isJavaScript = url.pathname.endsWith('.js');
 
-    const selfUrl = new URL(self.location);
+    // const selfUrl = new URL(self.location);
 
-    const isExternal = event.request.mode === 'cors' || selfUrl.hostname !== url.hostname;
+    // const isExternal = event.request.mode === 'cors' || selfUrl.hostname !== url.hostname;
 
     if(isOnline){
 
@@ -141,7 +141,7 @@ async function sendServiceWorkerMessage(message){
 
 function requestDataToCheckisOnline(){
 
-    fetch(new Request(`/fallingsand/test_online.txt`, {method: 'HEAD'})).then( ()=> {
+    fetch(new Request(`/test_online.txt`, {method: 'HEAD'})).then( ()=> {
 
         //console.log('Able to get the test data headers');
 
@@ -162,7 +162,7 @@ async function cacheOnly(event){
 
         return cacheResponse || 
         
-        caches.match('/404.html')
+        caches.match('/fallingsand/404.html')
         
         .then( response => response )
         
