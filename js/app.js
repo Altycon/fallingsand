@@ -13,6 +13,7 @@ const APP = {
 
     isOnline: true,
     isMobile: false,
+    refreshing: false,
     serviceWorker: undefined,
     indexedDatabse: undefined,
     fallingSandCanvas: undefined,
@@ -27,6 +28,75 @@ const APP = {
 
         document.querySelector('.notification-message').textContent = message;
         
+    },
+    closeConfirmationModal(confirmationModal){
+
+        confirmationModal.classList.remove('appear');
+    
+        setTimeout( ()=> {
+    
+            confirmationModal.classList.remove('open');
+    
+        },300);
+    },
+    openConfirmationModal(confirmationModal){
+
+        confirmationModal.classList.add('open');
+    
+        setTimeout( ()=> {
+    
+            confirmationModal.classList.add('appear');
+    
+            confirmationModal.querySelector('.confirmation-cancel-btn').focus();
+    
+        },100)
+    },
+    confirmSelection(message,callback){
+    
+        const confirmationModal = document.querySelector('.confirmation-modal');
+    
+        const messageOutput = confirmationModal.querySelector('.confirmation-message');
+    
+    
+        messageOutput.textContent = message;
+    
+    
+        confirmationModal.addEventListener('click', function handleConfirmationClickEvent(event){
+    
+            const { currentTarget, target } = event;
+        
+            if(!target.dataset.button) return;
+    
+            event.preventDefault();
+        
+            switch(target.dataset.button){
+        
+                case 'cancel':
+        
+                    APP.closeConfirmationModal(currentTarget);
+    
+                break;
+        
+                case 'confirm':
+        
+                    callback(currentTarget);
+    
+                    APP.closeConfirmationModal(currentTarget);
+        
+                break;
+    
+                default:
+    
+                    APP.closeConfirmationModal(currentTarget);
+    
+                break;
+            }
+    
+            currentTarget.removeEventListener('click', handleConfirmationClickEvent);
+        });
+    
+        APP.openConfirmationModal(confirmationModal);
+    
     },
     hasServiceWorker(){
 
@@ -54,7 +124,45 @@ const APP = {
 
             APP.serviceWorker = registration.installing || registration.waiting || registration.active;
 
-            //console.log('service worker registered');
+            if(registration.waiting){
+
+                // notify user of update
+
+                APP.confirmSelection(`A new version of "Sandy" is available. Would you like to update?`, ()=>{
+
+                    if(registration.waiting){
+
+                        registration.waiting.postMessage({ action: 'SKIP_WAITING' });
+
+                    }
+
+                });
+            }
+
+            registration.addEventListener('updatefound', ()=>{
+
+                if(registration.installing){
+
+                    registration.installing.addEventListener('statechange', ()=>{
+
+                        if(navigator.serviceWorker.controller){
+
+                            APP.confirmSelection(`A new version of "Sandy" is available. Would you like to update?`, ()=>{
+
+                                if(registration.waiting){
+            
+                                    registration.waiting.postMessage({ action: 'SKIP_WAITING' });
+            
+                                }else{
+
+                                    console.log('Service worker installed for the first time');
+                                }
+            
+                            })
+                        }
+                    })
+                }
+            })
 
         })
         .catch( (error)=> {
@@ -62,6 +170,8 @@ const APP = {
             console.log(`Failed to register`, error.message);
 
         });
+
+        
 
         // see if page currently has service worker
         if(navigator.serviceWorker.controller){
@@ -75,9 +185,18 @@ const APP = {
             });
         };
 
-        navigator.serviceWorker.oncontrollerchange = (event)=>{
+
+
+        navigator.serviceWorker.oncontrollerchange = ()=>{
 
             //console.log('New service worker activated', event);
+
+            if(!APP.refreshing){
+
+                window.location.reload();
+
+                APP.refreshing = true;
+            }
         };
 
         navigator.serviceWorker.addEventListener('message', ({ data })=>{
@@ -150,7 +269,7 @@ const APP = {
                 Sand.hue += 0.5;
 
                 APP.setActiveColorDisplay(Sand.hue);
-
+                
             }else{
 
                 if(Sand.hueCenter === undefined) Sand.hueCenter = Sand.hue;
@@ -471,11 +590,9 @@ const APP = {
 
         APP.listen();
 
-
-
         APP.controlMyImage();
 
     },
 };
-document.addEventListener('DOMContentLoaded', APP.init);
+window.addEventListener('load', APP.init);
 

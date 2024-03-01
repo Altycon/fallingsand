@@ -113,6 +113,8 @@ update(){
 
             const rightCell = Sand.grid[rightIndex];
 
+            cell.gravity++;
+
             if(downCell && downCell.state === 0){
 
                 Sand.nextGeneration[i].state = 0;

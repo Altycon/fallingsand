@@ -1,4 +1,4 @@
-const version = 15;
+const version = 5;
 const staticCacheName = `staticCache-${version}`;
 
 const assets = [
@@ -45,8 +45,20 @@ self.addEventListener('message', (event)=>{
     if('checkOnline' in data){
 
         event.waitUntil( requestDataToCheckisOnline() );
+
     }
-    
+
+    if('action' in data){
+
+        switch(data.action){
+
+            case 'SKIP_WAITING':
+
+                event.waitUntil( self.skipWaiting() );
+
+            break;
+        }
+    }
 });
 
 
