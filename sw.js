@@ -1,4 +1,4 @@
-const version = 7;
+const version = 9;
 const staticCacheName = `staticCache-${version}`;
 
 const assets = [

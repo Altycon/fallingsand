@@ -64,7 +64,7 @@ self.addEventListener('message', (event)=>{
 
             case 'initialize':
 
-                Sand.init(data.canvas, data.screenWidth < 500 ? 4:2);
+                Sand.init(data.canvas, data.screenWidth < 500 ? 4:4);
 
                 Sand.buildGrid();
 

@@ -23,6 +23,7 @@ const APP = {
     DPI: devicePixelRatio,
     autoColor: true,
     sandHue: undefined,
+    handleAddingSand: undefined,
 
     notify(message){
 
@@ -47,7 +48,7 @@ const APP = {
     
             confirmationModal.classList.add('appear');
     
-            confirmationModal.querySelector('.confirmation-cancel-btn').focus();
+            //confirmationModal.querySelector('.confirmation-cancel-btn').focus();
     
         },100)
     },
@@ -226,157 +227,6 @@ const APP = {
     
     },
 
-    fixCanvas(canvas,dpi){
-
-        const main = document.querySelector('main');
-    
-        const styleWidth = +getComputedStyle(main).getPropertyValue('width').slice(0,-2);
-        
-        const styleHeight = +getComputedStyle(main).getPropertyValue('height').slice(0,-2);
-    
-        canvas.setAttribute('width', styleWidth * dpi);
-    
-        canvas.setAttribute('height', styleHeight * dpi);
-    
-        return canvas;
-    
-    },
-    setActiveColorDisplay(hue){
-
-        document.querySelector('.falling-sand-active-color-display').style.backgroundColor = `hsl(${hue} 100% 50%)`;
-
-    },
-    handleAddingSandOnMove(event){
-
-        event.preventDefault();
-
-        const { clientX, clientY } = APP.isMobile ? event.touches[0]:event;
-
-        if(APP.worker){
-    
-            APP.worker.postMessage({
-
-                action: 'add',
-                positionX: Math.floor(clientX - APP.canvasLeft) * APP.DPI,
-                positionY: Math.floor(clientY - APP.canvasTop) * APP.DPI,
-                hueIncrease: APP.autoColor          
-            });
-
-        }else{
-
-            if(APP.autoColor){
-
-                Sand.hue += 0.5;
-
-                APP.setActiveColorDisplay(Sand.hue);
-                
-            }else{
-
-                if(Sand.hueCenter === undefined) Sand.hueCenter = Sand.hue;
-    
-                Sand.hue = Sand.hueCenter + Sand.rangeValues[Math.floor(Math.random()*Sand.rangeValues.length)];
-            }
-
-            Sand.addSand(
-
-                Math.floor(clientX - APP.canvasLeft) * APP.DPI, 
-                Math.floor(clientY - APP.canvasTop) * APP.DPI
-            );
-        }
-
-    },
-    handleAutoColorSwitch(event){
-
-        if(event.target.value === "false"){
-    
-            APP.autoColor = true;
-
-            event.target.value = "true";
-
-            event.target.style.backgroundColor = 'cornflowerblue';
-
-            event.target.style.color = 'black';
-
-            if(APP.worker){
-
-                APP.worker.postMessage({ action: 'change_hue', removeCenter: true })
-
-            }else{
-
-                APP.sandHue = undefined;
-
-            }
-
-        }else if(event.target.value === "true"){
-
-            APP.autoColor = false;
-
-            event.target.value = "false";
-
-            event.target.style.backgroundColor = 'black';
-
-            event.target.style.color = 'white';
-
-            if(APP.worker){
-
-                const colorInput = document.querySelector('#FallingSandColorInput')
-
-                APP.worker.postMessage({ action: 'change_hue', hue: Number(colorInput.value)})
-
-            }
-        }
-    },
-    handleColorInput(event){
-
-        const button = document.querySelector('#FallingSandAutoColorButton');
-    
-            if(button.value === "true"){
-
-                button.style.backgroundColor = 'black';
-
-                button.style.color = 'white';
-
-                button.value = "false";
-            }
-    
-            APP.autoColor = false;
-    
-            if(APP.worker){
-
-                APP.setActiveColorDisplay(event.target.value);
-
-                APP.worker.postMessage({ action: 'change_hue', hue: Number(event.target.value)})
-
-            }else{
-
-                Sand.hue = Number(event.target.value);
-
-                APP.setActiveColorDisplay(Sand.hue);
-
-                APP.sandHue = undefined;
-
-            }           
-
-    },
-    
-    clearFallingSandCanvas(){
-
-        if(confirm('Are you sure you want to reset the image?')){
-
-            if(APP.worker){
-
-                APP.worker.postMessage({ action: 'reset'})
-
-            }else{
-
-                Sand.clearDisplay();
-    
-                Sand.resetGrid();
-
-            }
-        }
-    },
-
     controlMyImage(){
 
         const myimage = document.querySelector('.myimage_wrapper');
@@ -472,10 +322,258 @@ const APP = {
 
     },
 
+    fixCanvas(canvas,dpi){
+
+        const main = document.querySelector('main');
+    
+        const styleWidth = +getComputedStyle(main).getPropertyValue('width').slice(0,-2);
+        
+        const styleHeight = +getComputedStyle(main).getPropertyValue('height').slice(0,-2);
+    
+        canvas.setAttribute('width', styleWidth * dpi);
+    
+        canvas.setAttribute('height', styleHeight * dpi);
+    
+        return canvas;
+    
+    },
+    setActiveColorDisplay(hue){
+
+        document.querySelector('.falling-sand-active-color-display').style.backgroundColor = `hsl(${hue} 100% 50%)`;
+
+    },
+    handleAutoColorSwitch(event){
+
+        if(event.target.value === "false"){
+    
+            APP.autoColor = true;
+
+            event.target.value = "true";
+
+            event.target.style.backgroundColor = 'cornflowerblue';
+
+            event.target.style.color = 'black';
+
+            if(APP.worker){
+
+                APP.worker.postMessage({ action: 'change_hue', removeCenter: true })
+
+            }else{
+
+                APP.sandHue = undefined;
+
+            }
+
+        }else if(event.target.value === "true"){
+
+            APP.autoColor = false;
+
+            event.target.value = "false";
+
+            event.target.style.backgroundColor = 'black';
+
+            event.target.style.color = 'white';
+
+            if(APP.worker){
+
+                const colorInput = document.querySelector('#FallingSandColorInput')
+
+                APP.worker.postMessage({ action: 'change_hue', hue: Number(colorInput.value)})
+
+            }
+        }
+    },
+    handleColorInput(event){
+
+        const button = document.querySelector('#FallingSandAutoColorButton');
+    
+            if(button.value === "true"){
+
+                button.style.backgroundColor = 'black';
+
+                button.style.color = 'white';
+
+                button.value = "false";
+            }
+    
+            APP.autoColor = false;
+    
+            if(APP.worker){
+
+                APP.setActiveColorDisplay(event.target.value);
+
+                APP.worker.postMessage({ action: 'change_hue', hue: Number(event.target.value)})
+
+            }else{
+
+                Sand.hue = Number(event.target.value);
+
+                APP.setActiveColorDisplay(Sand.hue);
+
+                APP.sandHue = undefined;
+
+            }           
+
+    },
+    
+    clearFallingSandCanvas(){
+
+        if(confirm('Are you sure you want to reset the image?')){
+
+            if(APP.worker){
+
+                APP.worker.postMessage({ action: 'reset'})
+
+            }else{
+
+                Sand.clearDisplay();
+    
+                Sand.resetGrid();
+
+            }
+        }
+    },
+    addSand(event){
+
+        event.preventDefault();
+
+        const { clientX, clientY } = APP.isMobile ? event.touches[0]:event;
+
+        if(APP.autoColor){
+
+            Sand.hue += 0.5;
+
+            APP.setActiveColorDisplay(Sand.hue);
+            
+        }else{
+
+            if(Sand.hueCenter === undefined) Sand.hueCenter = Sand.hue;
+
+            Sand.hue = Sand.hueCenter + Sand.rangeValues[Math.floor(Math.random()*Sand.rangeValues.length)];
+        }
+
+        Sand.addSand(
+
+            Math.floor(clientX - APP.canvasLeft) * APP.DPI, 
+            Math.floor(clientY - APP.canvasTop) * APP.DPI
+        );
+
+    },
+    addSandWithWorker(event){
+
+        event.preventDefault();
+
+        if(APP.isMobile){
+
+            const touches = event.changedTouches;
+
+            for (const touch of touches){
+
+                if(!touch || !touch.clientX || !touch.clientY) continue;
+
+                APP.worker.postMessage({
+
+                    action: 'add',
+                    positionX: Math.floor(touch.clientX - APP.canvasLeft) * APP.DPI,
+                    positionY: Math.floor(touch.clientY - APP.canvasTop) * APP.DPI,
+                    hueIncrease: APP.autoColor          
+                });
+            }
+
+        }else{
+
+            const { clientX, clientY } = event;
+
+            if(!clientX || ! clientY) return;
+
+            APP.worker.postMessage({
+
+                action: 'add',
+                positionX: Math.floor(clientX - APP.canvasLeft) * APP.DPI,
+                positionY: Math.floor(clientY - APP.canvasTop) * APP.DPI,
+                hueIncrease: APP.autoColor          
+            });
+            
+        }
+    },
+    handlePointerUp(event){
+
+        event.target.removeEventListener('pointermove', APP.handleAddingSand);
+
+        event.target.removeEventListener('pointerup', APP.handlePointerUp)
+
+    },
+    handlePointerDown(event){
+
+        if('button' in event){
+
+            switch(event.button){
+
+                case 0:
+                    // left click
+                    event.preventDefault();
+
+                    APP.fallingSandCanvas.addEventListener('pointermove', APP.handleAddingSand);
+
+                    APP.fallingSandCanvas.addEventListener('pointerup', APP.handlePointerUp);
+
+                break;
+
+                case 1:
+                    // middle button/wheel
+                
+                break;
+
+                case 2:
+                    // right click
+                    
+
+                break;
+
+            }
+        }
+
+    },
+    handleTouchEnd(event){
+
+        event.target.removeEventListener('touchmove', APP.handleAddingSand);
+
+        event.target.removeEventListener('touchend', APP.handleTouchEnd);
+    },
+    handleToucheStart(event){
+
+        event.preventDefault();
+
+        event.target.addEventListener('touchmove', APP.handleAddingSand);
+
+        event.target.addEventListener('touchend', APP.handleTouchEnd);
+
+        event.target.addEventListener('touchcancel', APP.handleTouchEnd);
+
+    },
+    
+
 
     listen(){
 
-        APP.fallingSandCanvas.addEventListener(APP.isMobile ? 'touchmove':'pointermove', APP.handleAddingSandOnMove);
+        if(APP.worker){
+
+            APP.handleAddingSand = APP.addSandWithWorker;
+
+        }else{
+
+            APP.handleAddingSand = APP.addSand;
+
+        }
+
+        if(APP.isMobile){
+
+            APP.fallingSandCanvas.addEventListener('touchstart', APP.handleToucheStart);
+
+        }else{
+
+            APP.fallingSandCanvas.addEventListener('pointerdown', APP.handlePointerDown);
+        }
 
         document.querySelector('#FallingSandAutoColorButton').addEventListener('click', APP.handleAutoColorSwitch);
 

@@ -14,7 +14,7 @@ export const Sand = {
     hueCenter: undefined,
     hue: 1,
     rangeValues: [-10,-9,-8,-7,-6,-5,-4,-3,-2,-1,0,1,2,3,4,5,6,7,8,9,10],
-    spread: 5,
+    spread: 10,
     direction: 1,
     TWO_PI: Math.PI*2,
 
@@ -39,13 +39,39 @@ loopGrid(callback){
 },
 buildGrid(){
     Sand.loopGrid((i)=>{
-        Sand.grid[i] = { state: 0, hue: 0, gravity: 0 };
-        Sand.nextGeneration[i] = { state: 0, hue: 0, gravity: 0 };
+        const row = Math.floor(i / Sand.columns);
+        const column = i % Sand.columns;
+
+        Sand.grid[i] = { 
+            col: column, 
+            row: row,  
+            state: 0, 
+            hue: 0, 
+            gravity: 0
+        };
+        Sand.nextGeneration[i] = { 
+            col: column, 
+            row: row, 
+            state: 0, 
+            hue: 0, 
+            gravity: 0
+        };
     });
 },
 buildRandomGrid(){
     Sand.loopGrid((i)=>{
-        Sand.grid[i] = Math.random() > 0.5 ? 1:0;
+        const row = Math.floor(i / Sand.columns);
+        const column = i % Sand.columns;
+
+        Sand.grid[i] = { 
+            col: column, 
+            row: row, 
+            size: Sand.resolution, 
+            state: 0, 
+            hue: 0, 
+            gravity: 0,
+            moving: false 
+        };
     });
 },
 addSand(positionX,positionY){
@@ -55,13 +81,13 @@ addSand(positionX,positionY){
 
     if(!row || !column) return;
 
-    for(let i = -Sand.spread; i <= Sand.spread; i+=2){
+    for(let i = -Sand.spread; i <= Sand.spread; i++){
         for(let j = -Sand.spread; j < Sand.spread; j++){
 
             if(i === 0 || j === 0) continue;
 
             const r = (row + j + Sand.rows) % Sand.rows;
-            const c = (column + (i + 1) + Sand.columns) % Sand.columns;
+            const c = (column + (i) + Sand.columns) % Sand.columns;
             const index = r * Sand.columns + c;
 
             const cell = Sand.grid[index];
@@ -72,7 +98,7 @@ addSand(positionX,positionY){
 
                 cell.state = 1;
 
-                cell.gravity = Math.floor(Math.random()*4) + 1;
+                cell.gravity = Math.floor(Math.random()*8) + 6;
 
             }
             
@@ -85,39 +111,52 @@ updateNextGenerationCell(index,state,hue,gravity){
     Sand.nextGeneration[index].gravity = gravity;
 },
 update(){
-    Sand.loopGrid((i)=>{
+    // Sand.loopGrid((i)=>{
        
-        Sand.updateNextGenerationCell(i,Sand.grid[i].state,Sand.grid[i].hue,Sand.grid[i].gravity);
+    //     Sand.updateNextGenerationCell(i,Sand.grid[i].state,Sand.grid[i].hue,Sand.grid[i].gravity);
 
-    });
+    // });
 
     Sand.loopGrid((i)=>{
         const cell = Sand.grid[i];
 
-        const row = Math.floor(i / Sand.columns);
-        const column = i % Sand.columns;
-
         if(cell.state === 1){
 
-            const downIndex = (row + cell.gravity) * Sand.columns + column;
+            const downIndex = (cell.row + 1) * Sand.columns + cell.col;
 
             const downCell = Sand.grid[downIndex];
 
             if(Math.random() < 0.5) Sand.direction *= -1;
 
-            const leftIndex = (row + 1) * Sand.columns + (column - Sand.direction);
+            const leftIndex = (cell.row + 1) * Sand.columns + (cell.col - Sand.direction);
 
-            const rightIndex = (row + 1) * Sand.columns + (column + Sand.direction);
+            const rightIndex = (cell.row + 1) * Sand.columns + (cell.col + Sand.direction);
 
             const leftCell = Sand.grid[leftIndex];
 
             const rightCell = Sand.grid[rightIndex];
 
+
             if(downCell && downCell.state === 0){
 
-                Sand.nextGeneration[i].state = 0;
+                const gravityIndex = (cell.row + cell.gravity) * Sand.columns + cell.col;
 
-                Sand.updateNextGenerationCell(downIndex,1,cell.hue,cell.gravity);
+                const gravityCell = Sand.grid[gravityIndex];
+
+                if(gravityCell && gravityCell.state === 0){
+
+                    Sand.nextGeneration[i].state = 0;
+
+                    Sand.updateNextGenerationCell(gravityIndex,cell.state,cell.hue,cell.gravity);
+
+                }else{
+
+                    Sand.nextGeneration[i].state = 0;
+
+                    Sand.updateNextGenerationCell(downIndex,1,cell.hue,cell.gravity + 1);
+                }
+
+                
 
             }else if(leftCell && leftCell.state === 0){
 
@@ -167,15 +206,14 @@ becomeCircle(col,row){
 renderGrid(){
     Sand.context.clearRect(0,0,Sand.canvasWidth,Sand.canvasHeight);
     Sand.loopGrid((i)=>{
-        const row = Math.floor(i / Sand.columns);
-        const col = i % Sand.columns;
+        
         const cell = Sand.grid[i];
 
-        if(cell.state === 1){
+        if(cell.state > 0){
 
             Sand.context.fillStyle = `hsl(${cell.hue} 80% 50%)`;
 
-            Sand.becomeSquare(col,row);
+            Sand.becomeSquare(cell.col,cell.row);
 
         }
     });
